@@ -25,7 +25,7 @@ if __name__ == "__main__":
             for line in lines:
                 line = line.strip()
                 url = line
-                if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}",i):#检测到IP自动反查域名
+                if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}",line):#检测到IP自动反查域名
                     domain = get_domain_byIP(line)
                     if domain:
                         print(f"ip：{url}，域名：{domain},公司名：{get_company(domain)}, 权重：{get_rank(domain)}", end="\n")
