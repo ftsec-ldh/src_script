@@ -2,10 +2,17 @@ import os
 import requests
 import re
 from info.api import*
+from info.google import google_search
 
 
 if __name__ == "__main__":
-    opear = input("单个操作(1)；批量操作(2)：")
+    opear = input("爬取谷歌内容(1)；批量操作(2)：")
+    if opear == "1":
+        print("------------------------------------------")
+        page_start = input("请输入爬取的起始页(例如0)：")
+        page_end = input("请输入爬取的结尾页(例如100)：")
+        crawl_content = input("请输入爬取的内容(例如谷歌语法)：")
+        google_search(page_start,page_end,crawl_content)
     if opear == "2":
         print("------------------------------------------")
         print('''批量记录权重、单位名(1)：''')
