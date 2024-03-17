@@ -73,19 +73,20 @@ def get_rank(url):
 
 
 def get_main(url):#获取关键域名和IP的部分
-    if "http://" not in url and "https://" not in url:#之所以要加http://是为了保证处理部分有http://头部的url列表，即使全部没有也加上方便统一处理
+    if "http://" not in url and "https://" not in url:#fofa导出来的只有https://没有http://...大无语
         url = "http://" + url
     rule = re.search(r"\b\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}\b", url)
     if rule:#返回true，说明输的是IP则提取IP关键部分，否则提取关键域名
         url = re.findall(r"\b\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}\b",url)
         url = ''.join(url)
     else:
-        url = re.findall(r"https?://(.*?)$",url)
+        url = re.findall(r"https?://([^:/]+)",url)
         url = ''.join(url)
     return url
 
 
 def get_domain_byIP(ip):
+    time.sleep(2)#防止被拉黑
     with open("proxies.txt","r+") as input:
         proxies = input.readlines()
 
