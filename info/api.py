@@ -1,5 +1,5 @@
 #从IP或域名列表中快速提取关键部分
-import platform,time,socket,urllib3,requests,re
+import platform,time,socket,urllib3,requests,re,random
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
-import os
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -86,16 +86,14 @@ def get_main(url):#获取关键域名和IP的部分
 
 
 def get_domain_byIP(ip):
-    time.sleep(2)#防拉黑
+    with open("proxies.txt","r+") as input:
+        proxies = input.readlines()
 
-    http_proxy = requests.get("http://139.59.166.134:5010/get?type=http").json()['proxy']
-    https_proxy = requests.get("http://139.59.166.134:5010/get?type=https").json()['proxy']
-    proxies = {"http":f"http://{http_proxy}",
-               "https":f"http://218.6.120.111:7777"}
+    proxy = random.choice(proxies)
 
     ip = get_main(ip)
     url = api_url2 + ip
-    html = requests.get(url,headers=headers,proxies=proxies).text
+    html = requests.get(url,headers=headers,proxies={"https":f"http://{proxy}"}).text
     soup = BeautifulSoup(html,"html.parser")
     all_tags = soup.find_all(class_="date")
     for tag in all_tags:
