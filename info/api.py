@@ -8,6 +8,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
 
+with open("conf/proxies.conf") as input:
+    proxy_server = input.read().strip()#proxypool服务器
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -21,7 +23,7 @@ if system =="Linux":
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.72 Safari/537.36'}
 
 api_url = "https://www.aizhan.com/cha/"#查权重的接口
-api_url2 = "https://site.ip138.com/"#反查域名的接口
+api_url2 = "http://site.ip138.com/"#反查域名的接口
 api_url3 = "https://aiqicha.baidu.com/s?q="#查公司注册资金的接口
 
 chrome_options = webdriver.ChromeOptions()
@@ -85,16 +87,23 @@ def get_main(url):#获取关键域名和IP的部分
     return url
 
 
-def get_domain_byIP(ip):
-    time.sleep(2)#防止被拉黑
-    with open("proxies.txt","r+") as input:
-        proxies = input.readlines()
+def get_domain_byIP(line,proxies):
+    time.sleep(3)#防拉黑
 
     proxy = random.choice(proxies)
 
-    ip = get_main(ip)
+    ip = get_main(line)
     url = api_url2 + ip
-    html = requests.get(url,headers=headers,proxies={"https":f"http://{proxy}"}).text
+
+    try:
+        html = requests.get(url,headers=headers,proxies={"http":f"http://{proxy}"}).text
+    except Exception:
+        requests.get(f"http://{proxy_server}/delete?proxy={proxy}")#删除失效代理
+        return f"error：{proxy}"
+
+    if "暂无结果" in html:
+        return False
+
     soup = BeautifulSoup(html,"html.parser")
     all_tags = soup.find_all(class_="date")
     for tag in all_tags:
@@ -104,3 +113,25 @@ def get_domain_byIP(ip):
         if domain:
             return domain
 
+def crawl_company(line,proxies):
+    if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}", line):  # 检测到IP自动反查域名
+        domain = get_domain_byIP(line,proxies)#无结果返回false，代理池出错返回error
+        if domain and "error" not in domain:#找到了域名且代理池不出错
+            name = get_company(line)
+            content = f"ip：{line}，域名：{domain},公司名：{name}, 权重：{get_rank(domain)}"
+            print(content, end="\n")
+            if "-" not in name and len(name) != 0:
+                with open("公司权重.txt", "a+") as output:
+                    output.write(content + "\n")
+        if domain == False:#无结果
+            print(line.replace("http://", "").replace("https://", "") + "未绑定域名，跳过此次查询", end="\n")
+        if "error" in str(domain):#代理池出错
+            return f"{str(domain)}"#返回代理池错误信息
+
+    else:
+        name = get_company(line)
+        content = f"站点：{line},公司名：{name}, 权重：{get_rank(line)}"
+        print(content, end="\n")
+        if "-" not in name and len(name) != 0:
+            with open("公司权重.txt", "a+") as output:
+                output.write(content + "\n")
