@@ -27,8 +27,8 @@ api_url2 = "http://site.ip138.com/"#反查域名的接口
 api_url3 = "https://aiqicha.baidu.com/s?q="#查公司注册资金的接口
 
 chrome_options = webdriver.ChromeOptions()
-#chrome_options.add_argument("--headless")
-#chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
 
 
 s = Service(driver_path)
