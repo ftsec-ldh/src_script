@@ -27,8 +27,8 @@ api_url2 = "http://site.ip138.com/"#反查域名的接口
 api_url3 = "https://aiqicha.baidu.com/s?q="#查公司注册资金的接口
 
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--disable-gpu")
 
 
 s = Service(driver_path)
@@ -52,9 +52,6 @@ def get_company(url):
     name = re.findall(r"<span id=\"icp_company\">(.*?)</span></li>",text)
     name = ''.join(name)
     return name
-
-
-    #return name,money
 
 #获取权重
 def get_rank(url):
@@ -117,7 +114,7 @@ def crawl_company(line,proxies):
     if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}", line):  # 检测到IP自动反查域名
         domain = get_domain_byIP(line,proxies)#无结果返回false，代理池出错返回error
         if domain and "error" not in domain:#找到了域名且代理池不出错
-            name = get_company(line)
+            name = get_company(domain)
             content = f"ip：{line}，域名：{domain},公司名：{name}, 权重：{get_rank(domain)}"
             print(content, end="\n")
             if "-" not in name and len(name) != 0:
