@@ -40,7 +40,7 @@ if __name__ == "__main__":
                         if "error" in str(crawl_info):
                             print(f"检测到代理池异常{str(crawl_info)}，已自动删除并开始重新爬取")
                             error_proxy = "".join(re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:.+",str(crawl_info)))
-                            proxies.remove(error_proxy + "\n"")#删除报错的代理池
+                            proxies.remove(error_proxy + "\n")#删除报错的代理池
                         else:
                             break
 
