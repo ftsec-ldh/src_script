@@ -115,7 +115,8 @@ def crawl_company(line,proxies):
         domain = get_domain_byIP(line,proxies)#无结果返回false，代理池出错返回error
         if domain and "error" not in domain:#找到了域名且代理池不出错
             name = get_company(domain)
-            content = f"ip：{line}，域名：{domain},公司名：{name}, 权重：{get_rank(domain)}"
+            rank = get_rank(domain)
+            content = f"ip：{line}，域名：{domain},公司名：{name}, 权重：{rank}"
             print(content, end="\n")
             if "-" not in name and len(name) != 0:
                 with open("公司权重.txt", "a+") as output:
