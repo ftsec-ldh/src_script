@@ -2,12 +2,12 @@
 自写的src开源脚本  
 未来将会持续更新，希望各位网安大佬们喜欢  
   
-异步或多线程需求后续会添加  
-也会更新Linux跨平台版，MAC系统短期内不打算更新  
+MAC系统短期内不打算更新  
 后面将添加批量漏扫的功能，敬请期待！  
 注意谷歌爬取如果在国内机器使用请设置代理走socks(在info/api.py中设置)  
 否则因GFW的原因无法正常使用该脚本  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
+代理池接口默认采用proxypool，请提前安装好redis和proxypool环境，后面会增加本地读取proxies.txt
   
 如有疑问BUG或建议请到issus或pull requests中去发帖  
   
