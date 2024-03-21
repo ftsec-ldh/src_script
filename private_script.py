@@ -1,14 +1,15 @@
 import os
 import requests
 import re
-from info.api import*
+from info.api import crawl_company
 from info.google import google_search
 from info.update_proxies import update_proxy
+from info.vulbox_commit import vulbox_login,vulbox_src_page
 
 
 if __name__ == "__main__":
     while True:
-        opear = input("爬取谷歌内容(1)；批量操作(2)；更新代理池(3)：")
+        opear = input("爬取谷歌内容(1)；批量操作(2)；更新代理池(3)；(4)盒子半自动化提交：")
         if opear == "1":
             print("------------------------------------------")
             page_start = input("请输入爬取的起始页(例如0)：")
@@ -19,35 +20,39 @@ if __name__ == "__main__":
             print("------------------------------------------")
             choice = input('''批量记录权重、单位名(1)：''')
             if choice == "1":
+                try:
+                    with open("proxies.txt", "r+") as proxies_input:
+                        proxies = proxies_input.readlines()#读代理文件
+                except FileNotFoundError:
+                    print("未检测到代理池文件，请先更新代理池")
+
                 file_name = input("请输入文件名：")
                 try:
-                    with open(file_name,"r+") as input:
-                        lines = input.readlines()
+                    with open(file_name, "r+") as input:
+                        lines = input.readlines()#读要爬的URL列表
                 except FileNotFoundError:
                     print("不存在该文件")
-                    continue
 
                 for line in lines:
-                    line = line.strip()
-                    url = line
-                    if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}",line):#检测到IP自动反查域名
-                        domain = get_domain_byIP(line)
-                        if domain:
-                            name = get_company(line)
-                            content = f"ip：{url}，域名：{domain},公司名：{name}, 权重：{get_rank(domain)}"
-                            print(content, end="\n")
-                            if "-" not in name:
-                                with open("公司权重.txt", "a+") as output:
-                                    output.write(content + "\n")
-                            continue
+                    while True:
+                        line = line.strip()
+                        crawl_info = crawl_company(line,proxies)
+                        if "error" in str(crawl_info):
+                            print(f"检测到代理池异常{str(crawl_info)}，已自动删除并开始重新爬取")
+                            error_proxy = "".join(re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:.+",str(crawl_info)))
+                            proxies.remove(error_proxy)#删除报错的代理池
                         else:
-                            print(line.replace("http://","").replace("https://","") + "未绑定域名，跳过此次查询",end="\n")
-                            continue
-                    name = get_company(line)
-                    content = f"站点：{url},公司名：{name}, 权重：{get_rank(line)}"
-                    print(content,end="\n")
-                    if "-" not in name:
-                        with open("公司权重.txt","a+") as output:
-                            output.write(content + "\n")
+                            break
+
         if opear == "3":
-            update_proxy()
+            choice = input("(1)使用proxypool：")
+            if choice == '1':
+                update_proxy()
+        if opear == "4":
+            domain = input("请输入存在漏洞的域名：")
+            type = {"1":"csrf","2":"sql注入","3":"xss","4":"信息泄露"}
+            choice = input("请选择漏洞类型:(1)csrf;(2)sql注入;(3)xss;(4)信息泄露:")
+            leak_type = type[choice]
+            vulbox_src_page(domain,leak_type)
+
+
