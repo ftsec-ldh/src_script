@@ -51,7 +51,7 @@ def update_proxy_Bypool():#检测并更新proxypool代理
     print(f"更新代理池完毕，存活{len(proxies)}个，已自动删除无效代理")
 
 
-def thread_check_ByFile(proxy,proxies):#proxypool多线程读取(字典读法)
+def thread_check_ByFile(proxy,proxies):#file多线程读取(字典读法)
     proxy = proxy.strip()
     if check(proxy):
         print(f"代理池{proxy}存活良好")
