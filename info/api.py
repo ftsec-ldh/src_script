@@ -95,7 +95,6 @@ def get_domain_byIP(line,proxies):
     try:
         html = requests.get(url,headers=headers,proxies={"http":f"http://{proxy}"}).text
     except Exception:
-        requests.get(f"http://{proxy_server}/delete?proxy={proxy}")#删除失效代理
         return f"error：{proxy}"
 
     if "暂无结果" in html:
