@@ -3,13 +3,13 @@ import requests
 import re
 from info.api import crawl_company
 from info.google import google_search
-from info.update_proxies import update_proxy
+from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_login,vulbox_src_page
 
 
 if __name__ == "__main__":
     while True:
-        opear = input("爬取谷歌内容(1)；批量操作(2)；更新代理池(3)；(4)盒子半自动化提交：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n请选择操作数：")
         if opear == "1":
             print("------------------------------------------")
             page_start = input("请输入爬取的起始页(例如0)：")
@@ -28,8 +28,8 @@ if __name__ == "__main__":
 
                 file_name = input("请输入文件名：")
                 try:
-                    with open(file_name, "r+") as input:
-                        lines = input.readlines()#读要爬的URL列表
+                    with open(file_name, "r+") as file_name_input:
+                        lines = file_name_input.readlines()#读要爬的URL列表
                 except FileNotFoundError:
                     print("不存在该文件")
 
@@ -45,9 +45,14 @@ if __name__ == "__main__":
                             break
 
         if opear == "3":
-            choice = input("(1)使用proxypool(需要到conf配置)：")
+            print("---------------------------------")
+            choice = input("(1)使用proxypool(需要到conf配置)\n(2)读当前文件代理：")
             if choice == '1':
-                update_proxy()
+                update_proxy_Bypool()
+            if choice == '2':
+                file_name= input("请输入文件名：")
+                update_proxy_ByFile(file_name)
+
         if opear == "4":
             domain = input("请输入存在漏洞的域名：")
             type = {"1":"csrf","2":"sql注入","3":"xss","4":"信息泄露"}
