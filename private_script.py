@@ -1,15 +1,17 @@
 import os
 import requests
-import re
+import re,platform
 from info.api import crawl_company
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_login,vulbox_src_page
+from info.get_ico_hash import get_hash_byURL,get_hash_byFile
+from leak.xray import windows_xray_scan,Linux_xray_scan
 
 
 if __name__ == "__main__":
     while True:
-        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n请选择操作数：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n请选择操作数：")
         if opear == "1":
             print("------------------------------------------")
             page_start = input("请输入爬取的起始页(例如0)：")
@@ -18,7 +20,7 @@ if __name__ == "__main__":
             google_search(page_start,page_end,crawl_content)
         if opear == "2":
             print("------------------------------------------")
-            choice = input('''批量记录权重、单位名(1)：''')
+            choice = input('''(1)记录权重、单位名\n(2)xray漏扫：''')
             if choice == "1":
                 try:
                     with open("proxies.txt", "r+") as proxies_input:
@@ -43,6 +45,14 @@ if __name__ == "__main__":
                             proxies.remove(error_proxy + "\n")#删除报错的代理池
                         else:
                             break
+            if choice == "2":
+                file_name = input("请输入要批量扫描的文件:")
+                system = platform.system()
+                if system == "Windows":
+                    windows_xray_scan(file_name)
+                if system == "Linux":
+                    Linux_xray_scan(file_name)
+
 
         if opear == "3":
             print("---------------------------------")
@@ -60,4 +70,22 @@ if __name__ == "__main__":
             leak_type = type[choice]
             vulbox_src_page(domain,leak_type)
 
+        if opear == "5":
+            choice = input("(1)本地文件读取\n(2)网页读取：")
+
+            if choice == "1":
+                file_name = input("请输入文件名:")
+                with open(file_name,"rb") as ico:
+                    ico_content = ico.read()
+                print("-----------Web-Hash-----------")
+                print(get_hash_byFile(ico_content))
+                print("-----------Web-Hash-----------")
+
+            if choice == "2":
+                url = input("请输入favicon.ico地址：")
+                if "http://" not in url and "https://" not in url:
+                    url = "http://" + url
+                print("-----------Web-Hash-----------")
+                print(get_hash_byURL(url))
+                print("-----------Web-Hash-----------")
 
