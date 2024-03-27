@@ -4,16 +4,12 @@
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
 Linux安装chrome拓展:  
-`sudo yum install google-chrome-stable --nogpg`
-MAC系统短期内不打算更新  
-后面将添加批量漏扫的功能，敬请期待！  
-注意谷歌爬取如果在国内机器使用请设置代理走socks(在info/api.py中设置)  
-否则因GFW的原因无法正常使用该脚本  
+`sudo yum install google-chrome-stable --nogpg`  
+谷歌爬取需设置代理走socks(在info/api.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
-代理池接口默认采用proxypool，请提前安装好redis和proxypool环境，后面会增加本地读取proxies.txt  
-<br>
-如有疑问BUG或建议请到issus或pull requests中去发帖<br>
-<br><br>
+  
+如有疑问BUG或建议请到issus或pull requests中去发帖  
+    
 本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责<br>
   
 版本：v0.0.6<br>
