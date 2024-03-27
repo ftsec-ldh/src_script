@@ -1,5 +1,4 @@
-# src_script
-#自写的src开源脚本
+# 自写的src开源脚本
 脚本推荐使用python3.8或以上  
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
