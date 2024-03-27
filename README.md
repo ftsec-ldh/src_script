@@ -1,15 +1,15 @@
 # src_script
-<h1>自写的src开源脚本</h1>
-脚本推荐使用python3.8或以上<br>
-selenium版本只支持4.0或以上<br>
-windows-chrome版本为122，版本不一致请自行更改driver版本<br>
-Linux安装chrome拓展:<br>
+#自写的src开源脚本
+脚本推荐使用python3.8或以上  
+selenium版本只支持4.0或以上  
+windows-chrome版本为122，版本不一致请自行更改driver版本  
+Linux安装chrome拓展:  
 `sudo yum install google-chrome-stable --nogpg`
-MAC系统短期内不打算更新<br>
-后面将添加批量漏扫的功能，敬请期待！<br>
-注意谷歌爬取如果在国内机器使用请设置代理走socks(在info/api.py中设置)<br>
-否则因GFW的原因无法正常使用该脚本<br><br>
-代理池更新：请使用前在conf/proxies.conf中设置好代理池接口<br>
+MAC系统短期内不打算更新  
+后面将添加批量漏扫的功能，敬请期待！  
+注意谷歌爬取如果在国内机器使用请设置代理走socks(在info/api.py中设置)  
+否则因GFW的原因无法正常使用该脚本  
+代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
 代理池接口默认采用proxypool，请提前安装好redis和proxypool环境，后面会增加本地读取proxies.txt  
 <br>
 如有疑问BUG或建议请到issus或pull requests中去发帖<br>
