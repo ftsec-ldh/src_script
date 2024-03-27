@@ -9,7 +9,10 @@ from selenium.webdriver.support.ui import Select
 import time,os
 
 description = {"信息泄露":"信息泄露可能会导致黑客进一步利用敏感信息盗取更关键的内容，甚至导致系统产生RCE漏洞",
-               "csrf":"csrf会造成第三者的滥用"}
+               "csrf":"csrf会造成第三者的滥用",
+               "sql注入":"攻击者未经授权可以访问数据库中的数据",
+               "xss":"放射形xss通过引诱用户点击一个链接到目标网站的恶意链接来实施攻击,dom型则更具危害性，受害者正常进入页面则会遭受攻击"
+               }
 
 suggestions = {
     "csrf":"增加referer检测和csrf_token验证",
@@ -18,25 +21,43 @@ suggestions = {
     "信息泄露":"设置访问该信息的权限配置，或只允许某一特定IP访问",
 }
 
-def vulbox_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
-
+def vulbox_login(user,passwd,domain,leak_type,company_name):#检测到没有cookie再执行这一步拿cookie
+    title = company_name + "页面存在" + leak_type
     s = Service("drivers/win64/chromedriver.exe")
-    driver = webdriver.Chrome(service=s)
-    driver.get("https://www.vulbox.com/account/login")
-    button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ant-btn.ant-btn-primary.ant-btn-block')))
-    username = driver.find_element(By.ID,"coordinated_username")
-    password = driver.find_element(By.ID, "coordinated_password")
-    checkbox = driver.find_element(By.CLASS_NAME,"ant-checkbox-input")
+    driver_vulbox = webdriver.Chrome(service=s)
+    driver_vulbox.get("https://www.vulbox.com/account/login")
+    button = WebDriverWait(driver_vulbox, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ant-btn.ant-btn-primary.ant-btn-block')))
+    username = driver_vulbox.find_element(By.ID,"coordinated_username")
+    password = driver_vulbox.find_element(By.ID, "coordinated_password")
+    checkbox = driver_vulbox.find_element(By.CLASS_NAME,"ant-checkbox-input")
 
     checkbox.click()
     username.send_keys(user)
     password.send_keys(passwd)
     button.click()
     time.sleep(5)
-    cookies = driver.get_cookies()
-    driver.get("https://user.vulbox.com/management/submit/72")
+    cookies = driver_vulbox.get_cookies()
     with open('cookies.txt','w+') as output:
         output.write(str(cookies))
+    driver_vulbox.get("https://user.vulbox.com/management/submit/72")
+    driver_vulbox.find_element(By.ID, "register_bug_title").send_keys(title)  # 漏洞标题
+    time.sleep(12)
+
+    driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @class='ant-radio-input']").click()  # 漏洞类别勾选
+    driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @value='0']").click()  # 返回参与评定勾选的对象
+    driver_vulbox.find_element(By.ID, "register_domain").send_keys(domain)  # 厂商域名
+    driver_vulbox.find_elements(By.XPATH, "//input[@type='radio' and @value='2']")[1].click()  # 漏洞等级
+
+    elements = driver_vulbox.find_elements(By.XPATH, '//p[@data-we-empty-p]')  # 修复建议
+    driver_vulbox.execute_script("arguments[0].innerText = arguments[1];", elements[1], suggestions[leak_type])
+
+    elements = driver_vulbox.find_elements(By.TAG_NAME, "textarea")
+    driver_vulbox.execute_script("arguments[0].value = arguments[1];", elements[0], description[leak_type])  # 漏洞简述
+    time.sleep(1)
+    driver_vulbox.execute_script("arguments[0].value = arguments[1];", elements[0],
+                                 description[leak_type])  # 不知道为什么要执行两遍才可以...
+
+
     input()
 
 def vulbox_src_page(domain,leak_type):
@@ -55,8 +76,9 @@ def vulbox_src_page(domain,leak_type):
 
         driver_vulbox.get("https://user.vulbox.com/management/submit/72")
         driver_vulbox.find_element(By.ID, "register_bug_title").send_keys(title)  # 漏洞标题
-        time.sleep(15)
+        time.sleep(12)
 
+        driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @class='ant-radio-input']").click()  # 漏洞类别勾选
         driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @value='0']").click()#返回参与评定勾选的对象
         driver_vulbox.find_element(By.ID, "register_domain").send_keys(domain)#厂商域名
         driver_vulbox.find_elements(By.XPATH, "//input[@type='radio' and @value='2']")[1].click()#漏洞等级
@@ -73,5 +95,5 @@ def vulbox_src_page(domain,leak_type):
 
     else:
         print("未检测到cookie文件，即将开始登录")
-        vulbox_login("username","password")
+        vulbox_login("username","password",domain,leak_type,company_name)#输入你的账号和密码
 
