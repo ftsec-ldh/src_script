@@ -18,7 +18,7 @@ system = platform.system()
 if system =="Windows":
     driver_path = r'drivers\win64\chromedriver.exe'
 if system =="Linux":
-    driver_path = r'drivers\linux64\chromedriver'
+    driver_path = r'drivers/linux64/chromedriver'
 
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.72 Safari/537.36'}
 
@@ -29,6 +29,8 @@ api_url3 = "https://aiqicha.baidu.com/s?q="#查公司注册资金的接口
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("no-sandbox")
+chrome_options.add_argument("--disable-extensions")
 
 
 s = Service(driver_path)
@@ -85,7 +87,7 @@ def get_main(url):#获取关键域名和IP的部分
 
 
 def get_domain_byIP(line,proxies):
-    time.sleep(3)#防拉黑
+    time.sleep(4)#防拉黑
 
     proxy = random.choice(proxies)
 
@@ -93,7 +95,7 @@ def get_domain_byIP(line,proxies):
     url = api_url2 + ip
 
     try:
-        html = requests.get(url,headers=headers,proxies={"http":f"http://{proxy}"}).text
+        html = requests.get(url,headers=headers,proxies={"http":f"http://{proxy}"},timeout=10).text
     except Exception:
         return f"error：{proxy}"
 
