@@ -43,7 +43,7 @@ def vulbox_login(user,passwd,domain,leak_type,company_name):#检测到没有cook
     driver_vulbox.find_element(By.ID, "register_bug_title").send_keys(title)  # 漏洞标题
     time.sleep(12)
 
-    driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @class='ant-radio-input']").click()  # 漏洞类别勾选
+    driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @class='ant-radio-input' and @value='1']").click()#漏洞类别勾选
     driver_vulbox.find_element(By.XPATH, "//input[@type='radio' and @value='0']").click()  # 返回参与评定勾选的对象
     driver_vulbox.find_element(By.ID, "register_domain").send_keys(domain)  # 厂商域名
     driver_vulbox.find_elements(By.XPATH, "//input[@type='radio' and @value='2']")[1].click()  # 漏洞等级
@@ -95,5 +95,5 @@ def vulbox_src_page(domain,leak_type):
 
     else:
         print("未检测到cookie文件，即将开始登录")
-        vulbox_login("username","password",domain,leak_type,company_name)#输入你的账号和密码
+        vulbox_login("1607131160","xin4680241",domain,leak_type,company_name)#输入你的账号和密码
 
