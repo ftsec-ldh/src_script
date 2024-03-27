@@ -13,7 +13,7 @@ Linux安装chrome拓展:
     
 本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责  
 使用截图：  
-![Linux平台](C:\Users\Administrator\Desktop\pic1.png "效果")
+![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
   
 版本：v0.0.6<br>
 一.修复Linux的driver驱动路径读取问题<br>
