@@ -3,8 +3,8 @@
 脚本推荐使用python3.8或以上  
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
-Linux安装chrome拓展:  
-`sudo yum install google-chrome-stable --nogpg`  
+Linux安装chrome拓展:    
+`sudo yum install google-chrome-stable --nogpg`    
 谷歌爬取需设置代理走socks(在info/api.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
   
