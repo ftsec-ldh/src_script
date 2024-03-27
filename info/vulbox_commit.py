@@ -126,5 +126,5 @@ def vulbox_src_page(domain,leak_type):
 
     else:
         print("未检测到cookie文件，即将开始登录")
-        vulbox_login("1607131160","xin4680241",domain,leak_type,company_name)#输入你的账号和密码
+        vulbox_login("username","password",domain,leak_type,company_name)#输入你的账号和密码
 
