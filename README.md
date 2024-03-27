@@ -1,7 +1,11 @@
 # src_script
 自写的src开源脚本  
 未来将会持续更新，希望各位网安大佬们喜欢  
-  
+本脚本推荐使用python3.8或以上  
+selenium版本只支持4.0或以上  
+windows-chrome版本为122，版本不一致请自行更改driver版本  
+Linux安装chrome拓展:  
+`sudo yum install google-chrome-stable --nogpg`
 MAC系统短期内不打算更新  
 后面将添加批量漏扫的功能，敬请期待！  
 注意谷歌爬取如果在国内机器使用请设置代理走socks(在info/api.py中设置)  
@@ -13,6 +17,12 @@ MAC系统短期内不打算更新
   
 本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责  
   
+版本：v0.0.6  
+一.修复Linux的driver驱动路径读取问题 
+二.增加xray批量扫描功能，支持Windows和Linux  
+三.增加获取ico哈希功能  
+四.更新代理池增加本地读取功能  
+
 版本：v0.0.5  
 一.增加代理池文件读取功能  
 二.优化了交互文字显示格式  
