@@ -4,7 +4,7 @@
 selenium版本只支持4.0或以上<br>
 windows-chrome版本为122，版本不一致请自行更改driver版本<br>
 Linux安装chrome拓展:<br>
-``sudo yum install google-chrome-stable --nogpg``
+`sudo yum install google-chrome-stable --nogpg`
 MAC系统短期内不打算更新<br>
 后面将添加批量漏扫的功能，敬请期待！<br>
 注意谷歌爬取如果在国内机器使用请设置代理走socks(在info/api.py中设置)<br>
