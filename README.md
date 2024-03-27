@@ -11,7 +11,9 @@ Linux安装chrome拓展:
   
 如有疑问BUG或建议请到issus或pull requests中去发帖  
     
-本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责<br>
+本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责  
+使用截图：  
+![Linux平台](C:\Users\Administrator\Desktop\pic1.png "效果")
   
 版本：v0.0.6<br>
 一.修复Linux的driver驱动路径读取问题<br>
