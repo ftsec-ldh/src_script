@@ -65,10 +65,12 @@ if __name__ == "__main__":
 
         if opear == "4":
             domain = input("请输入存在漏洞的域名：")
-            type = {"1":"csrf","2":"sql注入","3":"xss","4":"信息泄露"}
-            choice = input("请选择漏洞类型:(1)csrf;(2)sql注入;(3)xss;(4)信息泄露:")
+            type = {"1":"CSRF","2":"SQL注入","3":"XSS","4":"信息泄露"}
+            choice = input(f"请选择漏洞类型:{type}:")
             leak_type = type[choice]
-            vulbox_src_page(domain,leak_type)
+            leak_url = input("请输入漏洞url:")
+            vulbox_src_page(domain,leak_type,leak_url)
+
 
         if opear == "5":
             choice = input("(1)本地文件读取\n(2)网页读取：")
