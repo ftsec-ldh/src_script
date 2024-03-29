@@ -7,9 +7,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
+from lxml import etree
+import os
 
-with open("conf/proxies.conf") as input:
-    proxy_server = input.read().strip()#proxypool服务器
+with open("conf/proxies.conf") as proxy_input:
+    proxy_server = proxy_input.read().strip()#proxypool服务器
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -134,3 +136,74 @@ def crawl_company(line,proxies):
         if "-" not in name and len(name) != 0:
             with open("公司权重.txt", "a+") as output:
                 output.write(content + "\n")
+
+def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
+    chrome_options_area = webdriver.ChromeOptions()
+    chrome_options_area.add_argument("--headless")
+    chrome_options_area.add_argument("--disable-gpu")
+    chrome_options_area.add_argument("no-sandbox")
+    chrome_options_area.add_argument("--disable-extensions")
+    aiqicha_driver = webdriver.Chrome(service=s,options=chrome_options_area)
+
+    if os.path.exists("aiqicha_cookies.txt"):
+        aiqicha_driver.get(f"https://aiqicha.baidu.com/")
+        with open("aiqicha_cookies.txt", "r+") as cookie_input:
+            cookies = eval(cookie_input.read())
+        for cookie in cookies:
+            try:
+                aiqicha_driver.add_cookie(cookie)
+            except Exception:
+                pass
+
+        aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
+        time.sleep(3)
+        html = aiqicha_driver.page_source
+        if "百度安全验证" in html and "请完成下方验证后继续操作" in html:
+            chrome_options_area = webdriver.ChromeOptions()
+            aiqicha_driver = webdriver.Chrome(service=s, options=chrome_options_area)
+            aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
+            input("检测到验证码开启，请验证完毕以后输入任意值更新cookie：")
+            with open("aiqicha_cookies.txt","w+") as cookie_input:
+                cookies = aiqicha_driver.get_cookies()
+                cookie_input.write(str(cookies))
+        aiqicha_driver.find_element(By.XPATH,f"//a[@title='{company_name}']").click()
+        time.sleep(3)
+
+        handles = aiqicha_driver.window_handles
+        aiqicha_driver.switch_to.window(handles[1])
+
+        html = aiqicha_driver.page_source
+        html_tree = etree.HTML(html)
+
+        elements = html_tree.xpath("//td[preceding-sibling::td[@data-v-bbdd274a='' and contains(text(), '行政区划')]]")
+        address = elements[0].text
+
+        elements = html_tree.xpath("//td[preceding-sibling::td[contains(text(),'所属行业')]]")
+        division = elements[0].text.replace("\n","").replace(" ","")
+
+        elements = html_tree.xpath("//td[contains(text(), '元')]")
+        money = elements[0].text.replace(" ","").replace("\n","").replace("(元)","")
+
+        elements = html_tree.xpath('//span[@data-log-an="detail-head-phone"]/span')
+        phone_number = elements[0].text
+
+        if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
+            province = re.findall(r"(.+)市",address)[0]
+            city = re.findall(r"市(.+)",address)[0]
+        elif "西藏自治区" in address:
+            province = "西藏"
+            city = re.findall(r"区(.+)",address)[0]
+        else:
+            province = re.findall(r"(.+)省",address)[0]
+            city = re.findall(r"省(.+)",address)[0]
+
+        return {"money":money,"province":province,"city":city,"division":division,"phone_number",phone_number}
+    else:
+        aiqicha_driver.get(f"https://aiqicha.baidu.com/")
+        input("检测到你没有登录爱启查，请手动登录过验证码以后输入任意字继续：")
+        cookies = aiqicha_driver.get_cookies()
+        aiqicha_get(company_name)#保存cookie后递归调用
+        with open("aiqicha_cookies.txt","w+") as output:
+            output.writelines(str(cookies))
+        print("写入cookie完成，请重启本软件")
+        return 123
