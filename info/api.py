@@ -159,28 +159,27 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
                 pass
 
         aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
-        time.sleep(3)
+        try:
+            WebDriverWait(aiqicha_driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//div[@class='wrap']/a"))
+            )  # 等待元素
+        except Exception:
+            print("检测到需要重新过验证码，已自动删除aiqicha_cookies.txt，请再次更新cookies")
+            os.remove("aiqicha_cookies.txt")
+            aiqicha_driver.quit()
+            aiqicha_get(company_name)#递归调用
+
         html = aiqicha_driver.page_source
-        # if "百度安全验证" in html and "请完成下方验证后继续操作" in html:
-            # chrome_options_area2 = webdriver.ChromeOptions()
-            # aiqicha_driver2 = webdriver.Chrome(service=s, options=chrome_options_area2)
-            # aiqicha_driver2.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
-            # for cookie in cookies:
-            #     try:
-            #         aiqicha_driver2.add_cookie(cookie)
-            #     except Exception:
-            #         pass
-            # input("检测到验证码开启，请验证完毕后输入任意值：")
-            # with open("aiqicha_cookies.txt","w+") as cookie_output:
-            #     cookies = aiqicha_driver.get_cookies()
-            #     cookie_output.write(str(cookies))
 
         html_tree = etree.HTML(html)
         elements = html_tree.xpath("//div[@class='wrap']/a")[0].get("data-log-title")#获取第一个超链接跳转地址
         detail_page = "/company_detail_" + str(re.findall(r"\d.+",elements)[0])
         aiqicha_driver.get(f"https://aiqicha.baidu.com/{detail_page}")#使用无头模式这里会被检测到
 
-        time.sleep(6)
+        WebDriverWait(aiqicha_driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//td[preceding-sibling::td[@data-v-bbdd274a='' and contains(text(), '行政区划')]]"))
+        )#等待元素
 
         html = aiqicha_driver.page_source
 
@@ -207,14 +206,21 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
             city = re.findall(r"区(.+)",address)[0]
         else:
             province = re.findall(r"(.+)省",address)[0]
-            city = re.findall(r"省(.+)",address)[0]
-
+            city = re.findall(r"省(.+)市",address)[0]
+        aiqicha_driver.quit()
         return {"money":money,"province":province,"city":city,"division":division,"phone_number":phone_number}
 
     else:
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
-        input("检测到你没有登录爱启查，请手动登录过验证码以后输入任意字继续(若需要获取手机号需登录账号)：")
+        print("检测到你没有过验证，请手动过验证：")
+
+        WebDriverWait(aiqicha_driver, 60).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
+        )#等待元素
+
         cookies = aiqicha_driver.get_cookies()
         with open("aiqicha_cookies.txt","w+") as output:
             output.write(str(cookies))
         print("写入cookie完成")
+        aiqicha_driver.quit()
+        aiqicha_get(company_name)#递归调用
