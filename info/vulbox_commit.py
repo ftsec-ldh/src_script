@@ -59,7 +59,7 @@ def vulbox_login(user,passwd,domain,leak_type,company_name):#检测到没有cook
 
     input()
 
-def vulbox_src_page(domain,leak_type):
+def vulbox_src_page(domain,leak_type,leak_url):
     company_name = get_company(domain)
     area_dict = aiqicha_get(company_name)
     title = company_name + "页面存在" + leak_type
@@ -78,7 +78,10 @@ def vulbox_src_page(domain,leak_type):
         actions = ActionChains(driver_vulbox)  # 实例化actions类
 
         #######厂商名称##########
-        time.sleep(2)#等待加载完毕
+        WebDriverWait(driver_vulbox, 10).until(
+            EC.presence_of_element_located((By.XPATH, f"//div[@class='ant-select-selection__rendered']"))
+        )#等待元素
+
         element_leak_company = driver_vulbox.find_elements(By.XPATH,f"//div[@class='ant-select-selection__rendered']")[2]
         actions.send_keys_to_element(element_leak_company, company_name).pause(2).perform()
         element_choice = driver_vulbox.find_element(By.XPATH,f"//li[@class='ant-select-dropdown-menu-item']")
@@ -87,10 +90,18 @@ def vulbox_src_page(domain,leak_type):
 
         #######漏洞类型##########
         element_leak_type = driver_vulbox.find_element(By.CLASS_NAME,"ant-cascader-picker-label")
-        actions.click(element_leak_type).pause(2).perform()
+        actions.click(element_leak_type).perform()
+
+        WebDriverWait(driver_vulbox, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//li[@title='Web漏洞']"))
+        )#等待元素
 
         element_web_leak = driver_vulbox.find_element(By.XPATH, "//li[@title='Web漏洞']")
-        actions.click(element_web_leak).pause(2).perform()
+        actions.click(element_web_leak).perform()
+
+        WebDriverWait(driver_vulbox, 10).until(
+            EC.presence_of_element_located((By.XPATH, f"//li[@title='{leak_type}']"))
+        )#等待元素
 
         if leak_type == "信息泄露":
             element_choice = driver_vulbox.find_element(By.XPATH, "//li[@title='信息泄露']")
@@ -123,34 +134,49 @@ def vulbox_src_page(domain,leak_type):
         elements = driver_vulbox.find_element(By.XPATH,"//textarea[@id='register_bug_paper']")#漏洞简述
         actions.send_keys_to_element(elements,description[leak_type]).perform()
 
-
+        elements = driver_vulbox.find_element(By.XPATH,"//input[@placeholder='请输入漏洞url或出现的功能点']")
+        actions.send_keys_to_element(elements,leak_url).perform()
 
         province = area_dict["province"]
 
         element = driver_vulbox.find_elements(By.XPATH,"//span[@class='ant-cascader-picker-label']")[1]
-        actions.click(element).pause(3).perform()
+        actions.click(element).perform()
+
+        WebDriverWait(driver_vulbox, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//li[@title]"))
+        )#等待元素
 
         special = ['北京','天津','上海','重庆']
         if province in special and "重庆" not in province:
             element = driver_vulbox.find_element(By.XPATH,f"//li[@title='{province}']")
-            actions.click(element).pause(3).perform()
+            actions.click(element).perform()
 
             city = province + "市"
+
+            WebDriverWait(driver_vulbox, 10).until(
+                EC.presence_of_element_located((By.XPATH, f"//li[@title='{city}'"))
+            )  # 等待元素
+
             element = driver_vulbox.find_element(By.XPATH,f"//li[@title='{city}']")
             actions.click(element).perform()
-        if "重庆" in province:
+        elif "重庆" in province:
             element = driver_vulbox.find_element(By.XPATH,f"//li[@title='{province}']")
-            actions.click(element).pause(3).perform()#重庆没有city
+            actions.click(element).perform()#重庆没有city
         else:
+            city = area_dict["city"]
             element = driver_vulbox.find_element(By.XPATH, f"//li[@title='{province}']")
-            actions.click(element).pause(3).perform()
+            actions.click(element).perform()
 
-            element = driver_vulbox.find_element(By.XPATH,f"//li[text()]")
+            WebDriverWait(driver_vulbox, 10).until(
+                EC.presence_of_element_located((By.XPATH, f"//li[contains(text(),'{city}')]"))
+            )  # 等待元素
+
+            element = driver_vulbox.find_element(By.XPATH,f"//li[contains(text(),'{city}')]")
             actions.click(element).perform()
 
         input()
 
     else:
         print("未检测到cookie文件，即将开始登录")
-        vulbox_login("your_username","your_password",domain,leak_type,company_name)#输入你的账号和密码
+        vulbox_login("username","password",domain,leak_type,company_name)#输入你的账号和密码
 
