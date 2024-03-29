@@ -138,17 +138,20 @@ def crawl_company(line,proxies):
                 output.write(content + "\n")
 
 def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     chrome_options_area = webdriver.ChromeOptions()
-    chrome_options_area.add_argument("--headless")
-    chrome_options_area.add_argument("--disable-gpu")
-    chrome_options_area.add_argument("no-sandbox")
-    chrome_options_area.add_argument("--disable-extensions")
+    chrome_options_area.add_argument(f"user-agent={user_agent}")
     aiqicha_driver = webdriver.Chrome(service=s,options=chrome_options_area)
+
+
 
     if os.path.exists("aiqicha_cookies.txt"):
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         with open("aiqicha_cookies.txt", "r+") as cookie_input:
-            cookies = eval(cookie_input.read())
+            try:
+                cookies = eval(cookie_input.read())
+            except SyntaxError:
+                print("aiqicha_cookie格式有误，请删除该文件重新获取cookie")
         for cookie in cookies:
             try:
                 aiqicha_driver.add_cookie(cookie)
@@ -158,21 +161,30 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
         aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
         time.sleep(3)
         html = aiqicha_driver.page_source
-        if "百度安全验证" in html and "请完成下方验证后继续操作" in html:
-            chrome_options_area = webdriver.ChromeOptions()
-            aiqicha_driver = webdriver.Chrome(service=s, options=chrome_options_area)
-            aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
-            input("检测到验证码开启，请验证完毕以后输入任意值更新cookie：")
-            with open("aiqicha_cookies.txt","w+") as cookie_input:
-                cookies = aiqicha_driver.get_cookies()
-                cookie_input.write(str(cookies))
-        aiqicha_driver.find_element(By.XPATH,f"//a[@title='{company_name}']").click()
-        time.sleep(3)
+        # if "百度安全验证" in html and "请完成下方验证后继续操作" in html:
+            # chrome_options_area2 = webdriver.ChromeOptions()
+            # aiqicha_driver2 = webdriver.Chrome(service=s, options=chrome_options_area2)
+            # aiqicha_driver2.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
+            # for cookie in cookies:
+            #     try:
+            #         aiqicha_driver2.add_cookie(cookie)
+            #     except Exception:
+            #         pass
+            # input("检测到验证码开启，请验证完毕后输入任意值：")
+            # with open("aiqicha_cookies.txt","w+") as cookie_output:
+            #     cookies = aiqicha_driver.get_cookies()
+            #     cookie_output.write(str(cookies))
 
-        handles = aiqicha_driver.window_handles
-        aiqicha_driver.switch_to.window(handles[1])
+        html_tree = etree.HTML(html)
+        elements = html_tree.xpath("//div[@class='wrap']/a")[0].get("data-log-title")#获取第一个超链接跳转地址
+        detail_page = "/company_detail_" + str(re.findall(r"\d.+",elements)[0])
+        aiqicha_driver.get(f"https://aiqicha.baidu.com/{detail_page}")#使用无头模式这里会被检测到
+
+        time.sleep(6)
 
         html = aiqicha_driver.page_source
+
+
         html_tree = etree.HTML(html)
 
         elements = html_tree.xpath("//td[preceding-sibling::td[@data-v-bbdd274a='' and contains(text(), '行政区划')]]")
@@ -201,9 +213,8 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
 
     else:
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
-        input("检测到你没有登录爱启查，请手动登录过验证码以后输入任意字继续：")
+        input("检测到你没有登录爱启查，请手动登录过验证码以后输入任意字继续(若需要获取手机号需登录账号)：")
         cookies = aiqicha_driver.get_cookies()
         with open("aiqicha_cookies.txt","w+") as output:
-            output.writelines(str(cookies))
+            output.write(str(cookies))
         print("写入cookie完成")
-        aiqicha_get(company_name)  # 保存cookie后递归调用
