@@ -197,13 +197,13 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
             province = re.findall(r"(.+)省",address)[0]
             city = re.findall(r"省(.+)",address)[0]
 
-        return {"money":money,"province":province,"city":city,"division":division,"phone_number",phone_number}
+        return {"money":money,"province":province,"city":city,"division":division,"phone_number":phone_number}
+
     else:
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         input("检测到你没有登录爱启查，请手动登录过验证码以后输入任意字继续：")
         cookies = aiqicha_driver.get_cookies()
-        aiqicha_get(company_name)#保存cookie后递归调用
         with open("aiqicha_cookies.txt","w+") as output:
             output.writelines(str(cookies))
-        print("写入cookie完成，请重启本软件")
-        return 123
+        print("写入cookie完成")
+        aiqicha_get(company_name)  # 保存cookie后递归调用
