@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.webdriver import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from info.api import get_company
+from info.api import get_company,aiqicha_get
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 import time,os
@@ -37,7 +37,7 @@ def vulbox_login(user,passwd,domain,leak_type,company_name):#检测到没有cook
     button.click()
     time.sleep(5)
     cookies = driver_vulbox.get_cookies()
-    with open('cookies.txt','w+') as output:
+    with open('vulbox_cookies.txt','w+') as output:
         output.write(str(cookies))
     driver_vulbox.get("https://user.vulbox.com/management/submit/72")
     driver_vulbox.find_element(By.ID, "register_bug_title").send_keys(title)  # 漏洞标题
@@ -61,14 +61,15 @@ def vulbox_login(user,passwd,domain,leak_type,company_name):#检测到没有cook
 
 def vulbox_src_page(domain,leak_type):
     company_name = get_company(domain)
+    area_dict = aiqicha_get(company_name)
     title = company_name + "页面存在" + leak_type
 
-    if os.path.exists("cookies.txt"):
+    if os.path.exists("vulbox_cookies.txt"):
         s = Service("drivers/win64/chromedriver.exe")
         driver_vulbox = webdriver.Chrome(service=s)
         driver_vulbox.get("https://www.vulbox.com/account/login")
 
-        with open("cookies.txt", "r+") as cookie_input:
+        with open("vulbox_cookies.txt", "r+") as cookie_input:
             cookies = eval(cookie_input.read())
         for cookie in cookies:
             driver_vulbox.add_cookie(cookie)
@@ -122,9 +123,34 @@ def vulbox_src_page(domain,leak_type):
         elements = driver_vulbox.find_element(By.XPATH,"//textarea[@id='register_bug_paper']")#漏洞简述
         actions.send_keys_to_element(elements,description[leak_type]).perform()
 
+
+
+        province = area_dict["province"]
+
+        element = driver_vulbox.find_elements(By.XPATH,"//span[@class='ant-cascader-picker-label']")[1]
+        actions.click(element).pause(3).perform()
+
+        special = ['北京','天津','上海','重庆']
+        if province in special and "重庆" not in province:
+            element = driver_vulbox.find_element(By.XPATH,f"//li[@title='{province}']")
+            actions.click(element).pause(3).perform()
+
+            city = province + "市"
+            element = driver_vulbox.find_element(By.XPATH,f"//li[@title='{city}']")
+            actions.click(element).perform()
+        if "重庆" in province:
+            element = driver_vulbox.find_element(By.XPATH,f"//li[@title='{province}']")
+            actions.click(element).pause(3).perform()#重庆没有city
+        else:
+            element = driver_vulbox.find_element(By.XPATH, f"//li[@title='{province}']")
+            actions.click(element).pause(3).perform()
+
+            element = driver_vulbox.find_element(By.XPATH,f"//li[text()]")
+            actions.click(element).perform()
+
         input()
 
     else:
         print("未检测到cookie文件，即将开始登录")
-        vulbox_login("username","password",domain,leak_type,company_name)#输入你的账号和密码
+        vulbox_login("your_username","your_password",domain,leak_type,company_name)#输入你的账号和密码
 
