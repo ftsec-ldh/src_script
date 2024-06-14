@@ -20,6 +20,10 @@ Linux安装chrome拓展:
 使用截图：  
 ![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
 
+版本：v0.0.9  
+一.增加dirsearch快捷扫描功能(到conf/dirsearch.conf设置dirsearch的路径)
+二.增加oneforall智能化扫描与csv智能化提取
+
 版本：v0.0.8  
 一.删除XRAY漏扫功能(主动扫描太鸡肋，索性直接移除该功能)  
 二.批量操作增加去重、批量域名取IP、批量检测存活功能  
