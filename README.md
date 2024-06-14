@@ -2,8 +2,11 @@
 脚本推荐使用python3.8或以上  
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
+  
 Windows安装chrome拓展：  
+  
 https://googlechromelabs.github.io/chrome-for-testing/  
+  
 Linux安装chrome拓展:  
   
 `sudo yum install google-chrome-stable --nogpg`  
