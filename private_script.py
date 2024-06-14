@@ -1,4 +1,4 @@
-import re,platform,time,requests,os
+import re,platform,time,requests,os,glob
 from info.api import crawl_company,get_main
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
@@ -7,10 +7,12 @@ from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates
 from filter.check_alive import filter_urls
+from scan.dirsearch import dirscan
+from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
 
 if __name__ == "__main__":
     while True:
-        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n请选择操作数：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n请选择操作数：")
         #################爬谷歌内容###########################
         if opear == "1":
             print("------------------------------------------")
@@ -98,7 +100,7 @@ if __name__ == "__main__":
             ############################批量检测存活#######################################
         ###################批量操作########################
 
-        if opear == "3":
+        if opear == "3":#更新代理池
             print("---------------------------------")
             choice = input("(1)使用proxypool(需要到conf配置)\n(2)读当前文件代理：")
             if choice == '1':
@@ -107,7 +109,7 @@ if __name__ == "__main__":
                 file_name= input("请输入文件名：")
                 update_proxy_ByFile(file_name)
 
-        if opear == "4":
+        if opear == "4":#盒子半自动化提交
             domain = input("请输入存在漏洞的域名：")
             type = {"1":"CSRF","2":"SQL注入","3":"反射型XSS","4":"信息泄露","5":"弱口令"}
             choice = input(f"请选择漏洞类型:{type}:")
@@ -117,7 +119,7 @@ if __name__ == "__main__":
             vulbox_src_page(domain,leak_type,leak_url)
 
 
-        if opear == "5":
+        if opear == "5":#取网站ico哈希值
             choice = input("(1)本地文件读取\n(2)网页读取：")
 
             if choice == "1":
@@ -135,19 +137,40 @@ if __name__ == "__main__":
                 print("-----------Web-Hash-----------")
                 print(get_hash_byURL(url))
                 print("-----------Web-Hash-----------")
-        if opear == "6":
-            input_file = input("请输入文件名：")
-            output_file = "ip_addresses.txt"
-
-            with open(input_file, "r") as f:
-                domains = f.readlines()
-
-            with open(output_file, "w") as f:
-                for domain in domains:
-                    ip = domain_to_ip(get_main(domain))
-                    if ip:
-                        f.write(f"{domain.strip()} : {ip}\n")
-
-            print("Finished converting domains to IP addresses.")
 
 
+        if opear == "6":#目录扫描
+            url = input("请输入要扫描的网站：")
+            with open("conf/dirsearch.conf",encoding="utf-8") as input_file:
+                dirsearch_path = input_file.read()
+            if not dirsearch_path.endswith("/"):
+                dirsearch_path = dirsearch_path + "\\"
+            dirscan(dirsearch_path,url)
+
+        if opear == "7":#子域收集
+            with open("conf/oneforall.conf", encoding="utf-8") as input_file:
+                oneforall_path = input_file.read()
+            if not oneforall_path.endswith("/"):
+                oneforall_path = oneforall_path + "\\"
+
+            choice = input("(1)oneforall单目标扫描\n(2)oneforall多目标扫描\n(3)提取单个域名\n(4)提取所有域名\n(5)查看目前收集域名：")
+            if choice == "1":
+                url = input("请输入要收集的域名：")
+                domain_scan(oneforall_path, url)
+            if choice == "2":
+                file_name = input("请输入文件名：")
+                domains_scan(oneforall_path,file_name)
+            if choice == "3":
+                domain_name = input("请输入单个域名：")
+                filter_validIP(oneforall_path,domain_name)
+            if choice == "4":
+                filter_validIPs(oneforall_path)
+            if choice == "5":
+                print("-----------目前域名------------")
+                csv_files = glob.glob(f'{oneforall_path}results\*.csv')
+                for csv in csv_files:
+                    #print(csv)
+                    name = re.search(r'\\([^\\]+)\.csv$',csv).group(1)
+                    if "all_subdomain" not in name:
+                        print(name)
+                print("-----------目前域名------------")
