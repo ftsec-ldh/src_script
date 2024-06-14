@@ -8,7 +8,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
 from lxml import etree
-import os
+import os,base64
+from lxml import etree
 
 with open("conf/proxies.conf") as proxy_input:
     proxy_server = proxy_input.read().strip()#proxypool服务器
@@ -29,6 +30,7 @@ api_url2 = "http://site.ip138.com/"#反查域名的接口
 api_url3 = "https://aiqicha.baidu.com/s?q="#查公司注册资金的接口
 
 chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("no-sandbox")
@@ -38,6 +40,8 @@ chrome_options.add_argument("--disable-extensions")
 s = Service(driver_path)
 driver = webdriver.Chrome(service=s, options=chrome_options)
 
+
+
 def get_ip_address(domain):#ping功能，反查域名再正向解析判断域名是否真的绑定了IP
     try:
         ip_address = socket.gethostbyname(domain)
@@ -46,7 +50,7 @@ def get_ip_address(domain):#ping功能，反查域名再正向解析判断域名
         return "Error: Unable to resolve domain"
 
 #获取单位名称
-def get_company(url):
+def get_company(url,picture=0):#picture等于1则截图
     url = get_main(url)
     url = api_url + url
 
@@ -55,6 +59,8 @@ def get_company(url):
 
     name = re.findall(r"<span id=\"icp_company\">(.*?)</span></li>",text)
     name = ''.join(name)
+    if picture == 1:
+        driver.get_screenshot_as_file(f"aizhan_{name}.png")
     return name
 
 #获取权重
@@ -88,34 +94,52 @@ def get_main(url):#获取关键域名和IP的部分
     return url
 
 
-def get_domain_byIP(line,proxies):
+def base64_encode(data):
+    byte_data = data.encode('utf-8')
+    encoded_data = base64.b64encode(byte_data)
+    return encoded_data.decode('utf-8')
+
+
+def get_domain_byIP(line,fofa=0,proxies=0):
     time.sleep(4)#防拉黑
-
-    proxy = random.choice(proxies)
-
     ip = get_main(line)
-    url = api_url2 + ip
-
-    try:
-        html = requests.get(url,headers=headers,proxies={"http":f"http://{proxy}"},timeout=10).text
-    except Exception:
-        return f"error：{proxy}"
-
-    if "暂无结果" in html:
-        return False
-
-    soup = BeautifulSoup(html,"html.parser")
-    all_tags = soup.find_all(class_="date")
-    for tag in all_tags:
-        next = tag.find_next_sibling()
-        domain = str(next["href"])
-        domain = domain.replace("/","")
-        if domain:
+    if fofa == 1:#爬fofa
+        base64 = base64_encode(f'ip="{ip}" && is_domain=true')
+        text = requests.get(f"https://fofa.info/result?qbase64={base64}",headers=headers).text
+        html_etree = etree.HTML(text)
+        elements = html_etree.xpath("//span[@class='hsxa-highlight-color']")
+        total_result = elements[0].text
+        if total_result == '0':
+            return False
+        else:
+            domains = html_etree.xpath("//span[@class='hsxa-host']/a")
+            domain = domains[0].text.replace(" ","").replace("\n","")
             return domain
+    else:#爬ip138
+        proxy = random.choice(proxies)
+        url = api_url2 + ip
 
-def crawl_company(line,proxies):
+        try:
+            html = requests.get(url,headers=headers,proxies={"http":f"http://{proxy}"},timeout=10).text
+        except Exception:
+            return f"error：{proxy}"
+
+        if "暂无结果" in html:
+            return False
+
+        soup = BeautifulSoup(html,"html.parser")
+        all_tags = soup.find_all(class_="date")
+        for tag in all_tags:
+            next = tag.find_next_sibling()
+            domain = str(next["href"])
+            domain = domain.replace("/","")
+            if domain:
+                return domain
+
+def crawl_company(line,fofa=0,proxies=0):#fofa=0代表不启用fofa,proxies默认为0代表不启用代理池去反查域名
+    ###################传参IP才执行该步骤##########################
     if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}", line):  # 检测到IP自动反查域名
-        domain = get_domain_byIP(line,proxies)#无结果返回false，代理池出错返回error
+        domain = get_domain_byIP(line,fofa,proxies)#无结果返回false，代理池出错返回error 0代表用ip138
         if domain and "error" not in domain:#找到了域名且代理池不出错
             name = get_company(domain)
             rank = get_rank(domain)
@@ -126,9 +150,12 @@ def crawl_company(line,proxies):
                     output.write(content + "\n")
         if domain == False:#无结果
             print(line.replace("http://", "").replace("https://", "") + "未绑定域名，跳过此次查询", end="\n")
+
         if "error" in str(domain):#代理池出错
             return f"{str(domain)}"#返回代理池错误信息
 
+    ###################传参IP才执行该步骤##########################
+    ###################传参域名才执行该步骤##########################
     else:
         name = get_company(line)
         content = f"站点：{line},公司名：{name}, 权重：{get_rank(line)}"
@@ -136,14 +163,13 @@ def crawl_company(line,proxies):
         if "-" not in name and len(name) != 0:
             with open("公司权重.txt", "a+") as output:
                 output.write(content + "\n")
+    ###################传参域名才执行该步骤##########################
 
-def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
+def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     chrome_options_area = webdriver.ChromeOptions()
     chrome_options_area.add_argument(f"user-agent={user_agent}")
     aiqicha_driver = webdriver.Chrome(service=s,options=chrome_options_area)
-
-
 
     if os.path.exists("aiqicha_cookies.txt"):
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
@@ -165,13 +191,14 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
                     (By.XPATH, "//div[@class='wrap']/a"))
             )  # 等待元素
         except Exception:
-            print("检测到需要重新过验证码，已自动删除aiqicha_cookies.txt，请再次更新cookies")
             os.remove("aiqicha_cookies.txt")
+            print("检测到需要重新过验证码，已自动删除aiqicha_cookies.txt，请再次更新cookies")
             aiqicha_driver.quit()
-            aiqicha_get(company_name)#递归调用
+            print("cookie更新完毕，请再次重启。")
+            exit()
 
         html = aiqicha_driver.page_source
-
+        aiqicha_driver.get_screenshot_as_file(f"aiqicha_{company_name}.png")
         html_tree = etree.HTML(html)
         elements = html_tree.xpath("//div[@class='wrap']/a")[0].get("data-log-title")#获取第一个超链接跳转地址
         detail_page = "/company_detail_" + str(re.findall(r"\d.+",elements)[0])
@@ -214,13 +241,12 @@ def aiqicha_get(company_name):#返回字典[公司省份、区市、注册资金
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         print("检测到你没有过验证，请手动过验证：")
 
-        WebDriverWait(aiqicha_driver, 60).until(
+        WebDriverWait(aiqicha_driver, 600).until(
             EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
         )#等待元素
 
         cookies = aiqicha_driver.get_cookies()
         with open("aiqicha_cookies.txt","w+") as output:
             output.write(str(cookies))
-        print("写入cookie完成")
+        print("写入cookie完成，请重启我")
         aiqicha_driver.quit()
-        aiqicha_get(company_name)#递归调用
