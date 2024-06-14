@@ -11,7 +11,7 @@ Linux安装chrome拓展:
   
 `sudo yum install google-chrome-stable --nogpg`  
   
-谷歌爬取需设置代理走socks5(在info/api.py中设置)  
+谷歌爬取需设置代理走socks5(在info/google.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
   
 如有疑问BUG或建议请到issus或pull requests中去发帖  
