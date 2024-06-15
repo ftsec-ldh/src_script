@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
                     for line in lines:
                             line = line.strip()
-                            crawl_info = crawl_company(line,1)
+                            crawl_info = crawl_company(line,1)#这里没有传递proxies，故不启用
 
                 ############################直接爬fofa########################################
                 ############################代理池爬ip138取IP##################################
@@ -140,12 +140,26 @@ if __name__ == "__main__":
 
 
         if opear == "6":#目录扫描
-            url = input("请输入要扫描的网站：")
+            url = input("要扫描的网站：")
+            thread = input("线程数：")
+            language = input("扫描类型(1)php (2)asp (3)jsp (4)全部：")
+            proxies = input("http代理(不走代理填空即可,例如:127.0.0.1:10809)：")
+            if language == '1':
+                language = "php"
+            elif language == '2':
+                language = "asp"
+            elif language == '3':
+                language = "jsp"
+            elif language == '4':
+                language = "*"
+            else:
+                print("请输入正确的类型")
+                continue
             with open("conf/dirsearch.conf",encoding="utf-8") as input_file:
                 dirsearch_path = input_file.read()
             if not dirsearch_path.endswith("/"):
                 dirsearch_path = dirsearch_path + "\\"
-            dirscan(dirsearch_path,url)
+            dirscan(dirsearch_path,url,thread,language,proxies)#正式开始扫描
 
         if opear == "7":#子域收集
             with open("conf/oneforall.conf", encoding="utf-8") as input_file:
@@ -169,7 +183,6 @@ if __name__ == "__main__":
                 print("-----------目前域名------------")
                 csv_files = glob.glob(f'{oneforall_path}results\*.csv')
                 for csv in csv_files:
-                    #print(csv)
                     name = re.search(r'\\([^\\]+)\.csv$',csv).group(1)
                     if "all_subdomain" not in name:
                         print(name)
