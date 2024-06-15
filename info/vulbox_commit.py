@@ -6,7 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from info.api import get_company,aiqicha_get
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
-import time,os
+from selenium.webdriver.common.keys import Keys
+import time,os,pyperclip
+
 
 description = {"信息泄露":"信息泄露可能会导致黑客进一步利用敏感信息盗取更关键的内容，甚至导致系统产生RCE漏洞",
                "CSRF":"csrf会造成第三者的滥用",
@@ -45,15 +47,13 @@ def vulbox_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
 
 def vulbox_src_page(domain,leak_type,leak_url):
     if os.path.exists("vulbox_cookies.txt"):
-
-        company_name = get_company(domain)#获取公司名
-        area_dict = aiqicha_get(company_name)#获取公司地址、注册资金、行业划分
+        company_name = get_company(domain,1)#获取公司名
+        area_dict = aiqicha_get(company_name,1)#获取公司地址、注册资金、行业划分
         title = company_name + "页面存在" + leak_type
 
         s = Service("drivers/win64/chromedriver.exe")
         driver_vulbox = webdriver.Chrome(service=s)
         driver_vulbox.get("https://www.vulbox.com/account/login")
-
         with open("vulbox_cookies.txt", "r+") as cookie_input:
             cookies = eval(cookie_input.read())
         for cookie in cookies:
@@ -111,9 +111,11 @@ def vulbox_src_page(domain,leak_type,leak_url):
         actions.send_keys_to_element(elements,suggestions[leak_type]).perform()
 
         elements = driver_vulbox.find_element(By.XPATH,"//textarea[@id='register_bug_paper']")#漏洞简述
+        actions.move_to_element(elements).send_keys(Keys.PAGE_UP).perform()#往上滚动防止点不到漏洞简述
         actions.send_keys_to_element(elements,description[leak_type]).perform()
 
-        elements = driver_vulbox.find_element(By.XPATH,"//input[@placeholder='请输入漏洞url或出现的功能点']")
+
+        elements = driver_vulbox.find_element(By.XPATH,"//input[@placeholder='请输入漏洞url或出现的功能点']")#漏洞URL/功能点
         actions.send_keys_to_element(elements,leak_url).perform()
 
         province = area_dict["province"]
