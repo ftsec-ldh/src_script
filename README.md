@@ -2,6 +2,7 @@
 脚本推荐使用python3.8或以上  
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
+目前只有权重IP反查支持跨Win/Linux平台  
   
 Windows安装chrome拓展：  
   
@@ -19,6 +20,12 @@ Linux安装chrome拓展:
 本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责  
 使用截图：  
 ![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
+![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)
+![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)
+![avfcc-i9nt1](https://github.com/1607131160/src_script/assets/128038117/87e092d4-c156-48f2-ab29-2e80aa798e83)
+
+
+
 
 版本：v0.1.0  
 一.添加补天半自动化提交功能  
