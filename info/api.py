@@ -228,11 +228,17 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         elements = html_tree.xpath("//td[preceding-sibling::td[@data-v-bbdd274a='' and contains(text(), '行政区划')]]")
         address = elements[0].text
 
+
         elements = html_tree.xpath("//td[preceding-sibling::td[contains(text(),'所属行业')]]")
         division = elements[0].text.replace("\n","").replace(" ","")
+        if division == "-":
+            division = "None"
 
-        elements = html_tree.xpath("//td[contains(text(), '元')]")
-        money = elements[0].text.replace(" ","").replace("\n","").replace("(元)","")
+        try:
+            elements = html_tree.xpath("//td[contains(text(), '元')]")
+            money = elements[0].text.replace(" ","").replace("\n","").replace("(元)","")
+        except Exception:
+            money = "None"
 
         elements = html_tree.xpath('//span[@data-log-an="detail-head-phone"]/span')
         phone_number = elements[0].text
@@ -240,10 +246,11 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
             province = re.findall(r"(.+)市",address)[0]
             city = re.findall(r"市(.+)",address)[0]
-            area = ""
+            area = "None"
         elif "西藏自治区" in address:
             province = "西藏"
             city = re.findall(r"区(.+)",address)[0]
+            area = "None"
         else:
             province = re.findall(r"(.+)省",address)[0]
             city = re.findall(r"省(.+)市",address)[0]
