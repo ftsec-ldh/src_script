@@ -3,6 +3,7 @@ from info.api import crawl_company,get_main
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_login,vulbox_src_page
+from info.butian_commit import butian_login,butian_src_page
 from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates
@@ -12,7 +13,7 @@ from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validI
 
 if __name__ == "__main__":
     while True:
-        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n请选择操作数：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n请选择操作数：")
         #################爬谷歌内容###########################
         if opear == "1":
             print("------------------------------------------")
@@ -187,3 +188,11 @@ if __name__ == "__main__":
                     if "all_subdomain" not in name:
                         print(name)
                 print("-----------目前域名------------")
+        if opear == "8":#补天自动化提交
+            domain = input("请输入存在漏洞的域名：")
+            type = {"1": "CSRF", "2": "SQL注入", "3": "反射型XSS", "4": "信息泄露", "5": "弱口令"}
+            choice = input(f"请选择漏洞类型:{type}:")
+            leak_type = type[choice]
+
+            leak_url = input("请输入漏洞url:")
+            butian_src_page(domain, leak_type, leak_url)
