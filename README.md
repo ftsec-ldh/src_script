@@ -19,6 +19,10 @@ Linux安装chrome拓展:
 本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为，作者概不负责  
 使用截图：  
 ![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
+
+版本：v0.1.0  
+一.添加补天半自动化提交功能  
+二.接口aiqicha_get返回字典添加area行政区划键值  
   
 版本：v0.0.9  
 一.增加dirsearch快捷扫描功能(到conf/dirsearch.conf设置dirsearch的路径)  
