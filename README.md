@@ -18,7 +18,11 @@ Linux安装chrome拓展:
 如有疑问BUG或建议请到issus或pull requests中去发帖  
     
 本工具旨在为信息收集提供便利性，仅用于学习行为，如使用者有任何侵权或违法犯罪行为与我无关！  
+  
 希望黑客们点个star！万分感谢！！！  
+希望黑客们点个star！万分感谢！！！  
+希望黑客们点个star！万分感谢！！！  
+  
 使用截图：  
 ![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
 ![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)
