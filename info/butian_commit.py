@@ -11,18 +11,21 @@ import time,os,pyperclip
 
 
 description = {"信息泄露":"信息泄露可能会导致黑客进一步利用敏感信息盗取更关键的内容，甚至导致系统产生RCE漏洞",
-               "CSRF":"csrf会造成第三者的滥用",
+               "逻辑漏洞":"逻辑漏洞就是指攻击者利用业务的设计缺陷，获取敏感信息或破坏业务的完整性",
                "SQL注入":"攻击者未经授权可以访问数据库中的数据",
                "XSS":"反射xss通过引诱用户点击一个链接到目标网站的恶意链接来实施攻击,dom型则更具危害性，受害者正常进入页面则会遭受攻击",
-               "弱口令":"弱口令可能导致未经授权的用户获得对系统、应用程序或数据的访问权限。这可能会导致数据泄露、篡改、删除或者系统被滥用,如果用户在多个网站或服务中使用相同的弱密码，一旦其中一个网站的密码泄露，攻击者就能够使用该密码尝试登录其他网站，进而导致更大范围的信息泄露"
+               "弱口令":"弱口令可能导致未经授权的用户获得对系统、应用程序或数据的访问权限。这可能会导致数据泄露、篡改、删除或者系统被滥用,如果用户在多个网站或服务中使用相同的弱密码，一旦其中一个网站的密码泄露，攻击者就能够使用该密码尝试登录其他网站，进而导致更大范围的信息泄露",
+               "代码执行":"远程代码执行简称RCE，是一类软件安全缺陷/漏洞。RCE 漏洞将允许恶意行为人通过 LAN、WAN 或 Internet 在远程计算机上执行自己选择的任何代码，属于更广泛的任意代码执行 (ACE) 漏洞类别。"
+
                }
 
 suggestions = {
-    "CSRF":"增加referer检测和csrf_token验证",
+    "逻辑漏洞":"修复不严谨的业务判断逻辑，对关键参数和用户COOKIE或鉴权认证进行校验",
     "SQL注入":"严格限制变量类型，比如整型变量就采用intval()函数过滤，数据库中的存储字段必须对应为int型",
     "XSS":"白名单过滤 根据白名单的标签和属性对数据进行过滤，以此来对可执行的脚本进行清除(如script标签，img标签的onerror属性等",
     "信息泄露":"设置访问该信息的权限配置，或只允许某一特定IP访问",
-    "弱口令":"使用足够长度、包含大小写字母、数字和特殊字符的密码；还可以实施密码策略，要求用户设置符合安全标准的密码，如长度、复杂度要求，并对密码进行定期的过期和强制更改"
+    "弱口令":"使用足够长度、包含大小写字母、数字和特殊字符的密码；还可以实施密码策略，要求用户设置符合安全标准的密码，如长度、复杂度要求，并对密码进行定期的过期和强制更改",
+    "代码执行":"1.通用的修复方案，升级插件/框架/服务最新版\n2.如若必须使用危险函数，那么针对危险函数进行过滤\n3.在进入执行命令函数前进行严格的检测和过滤\n4.尽量不要使用命令执行函数，不能完全控制的危险函数最好不使用，如果非要用的话可以加验证防止被其他人利用"
 }
 
 def butian_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
@@ -92,14 +95,29 @@ def butian_src_page(domain,leak_type,leak_url):
         element = driver_butian.find_element(By.XPATH, f"//textarea[@id='repair_suggest']")#修复方案
         actions.send_keys_to_element(element, suggestions[leak_type]).pause(1).perform()
 
+        print(area_dict)
 
-        dict_change = {"科技推广和应用服务业":"科学研究和技术服务业"}
-        s1 = Select(driver_butian.find_element(By.ID, "industry1"))#所属行业
-        s1.select_by_visible_text(dict_change[area_dict["division"]])
+        dict_change = {
+            "科技推广和应用服务业":"科学研究和技术服务业",
+            "软件和信息技术服务业":"信息传输、软件和信息技术服务业"
+                       }
+        try:
+            s1 = Select(driver_butian.find_element(By.ID, "industry1"))#所属行业
+            s1.select_by_visible_text(dict_change[area_dict["division"]])
+        except Exception:
+            print("该域名所属行业未知，如爱企查显示有行业则说明配置丢失")
 
-        division_type = {'科技推广和应用服务业':'335'}
-        element = WebDriverWait(driver_butian, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='{division_type[area_dict['division']]}']")))
-        actions.click(element).perform()
+        division_type = {
+            '科技推广和应用服务业':"335",
+            '软件和信息技术服务业':"330",
+            '互联网和相关服务':"331",
+            '电信、广播电视和卫星传输服务':"30",
+        }
+        try:#行业分类checkbox
+            element = WebDriverWait(driver_butian, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='{division_type[area_dict['division']]}']")))
+            actions.click(element).perform()
+        except Exception:
+            print("该域名所属行业未知，如爱企查显示有行业则说明配置丢失")
 
         select_elements = driver_butian.find_elements(By.ID, "selec1")#所属地区-省
         for select in select_elements:
