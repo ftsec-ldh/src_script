@@ -7,7 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
-from lxml import etree
 import os,base64
 from lxml import etree
 
@@ -39,6 +38,34 @@ chrome_options.add_argument("--disable-extensions")
 
 s = Service(driver_path)
 driver = webdriver.Chrome(service=s, options=chrome_options)
+
+#将提取到的域名再取主域名查权重，防止主域名比二级域名权重高
+def extract_main_domain(line):
+    def get_main_domain(domain):
+        parts = domain.split('.')
+        if len(parts) < 2:
+            return domain
+        if parts[-1] in ('cn', 'com', 'net', 'org', 'gov', 'edu'):
+            return '.'.join(parts[-3:]) if parts[-2] in ('com', 'net', 'org', 'gov', 'edu') else '.'.join(parts[-2:])
+        else:
+            return '.'.join(parts[-2:])
+
+    if line.startswith('ip：'):
+        domain_match = re.search(r'域名：([a-zA-Z0-9.-]+)', line)
+        if domain_match:
+            domain = domain_match.group(1)
+            return get_main_domain(domain)
+    elif line.startswith('站点：'):
+        site_match = re.search(r'站点：https?://([a-zA-Z0-9.-]+)', line)
+        if site_match:
+            site = site_match.group(1)
+            return get_main_domain(site)
+        else:
+            domain_match = re.search(r'站点：([a-zA-Z0-9.-]+)', line)
+            if domain_match:
+                domain = domain_match.group(1)
+                return get_main_domain(domain)
+    return None
 
 
 
@@ -136,7 +163,7 @@ def get_domain_byIP(line,fofa=0,proxies=0):
             if domain:
                 return domain
 
-def crawl_company(line,fofa=0,proxies=0):#fofa=0代表不启用fofa,proxies默认为0代表不启用代理池去反查域名
+def crawl_company(line,fofa=0,proxies=0,again=0):#fofa=0不启用fofa | proxies为0反查不用代理 | again=0写文件改个名(主域名查权重)
     ###################传参IP才执行该步骤##########################
     if re.search(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}", line):  # 检测到IP自动反查域名
         domain = get_domain_byIP(line,fofa,proxies)#无结果返回false，代理池出错返回error 0代表用ip138
@@ -146,8 +173,12 @@ def crawl_company(line,fofa=0,proxies=0):#fofa=0代表不启用fofa,proxies默�
             content = f"ip：{line}，域名：{domain},公司名：{name}, 权重：{rank}"
             print(content, end="\n")
             if "-" not in name and len(name) != 0:
-                with open("公司权重.txt", "a+") as output:
-                    output.write(content + "\n")
+                if again == 0:
+                    with open("公司权重.txt", "a+") as output:
+                        output.write(content + "\n")
+                elif again == 1:
+                    with open("主域名查权重.txt", "a+") as output:
+                        output.write(content + "\n")
         if domain == False:#无结果
             print(line.replace("http://", "").replace("https://", "") + "未绑定域名，跳过此次查询", end="\n")
 
