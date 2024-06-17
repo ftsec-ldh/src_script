@@ -1,5 +1,5 @@
 import re,platform,time,requests,os,glob
-from info.api import crawl_company,get_main
+from info.api import crawl_company,get_main,extract_main_domain
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_login,vulbox_src_page
@@ -25,7 +25,7 @@ if __name__ == "__main__":
        ###################批量操作########################
         if opear == "2":
             print("------------------------------------------")
-            choice = input('''(1)记录权重、单位名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活：''')
+            choice = input('''(1)记录权重、单位名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重：''')
             if choice == "1":
                 print("------------------------------------------")
                 choice = input("(1)fofa(有次数限制)\n(2)ip138(需要代理池防拉黑)\n请输入爬取的引擎：")
@@ -39,8 +39,8 @@ if __name__ == "__main__":
                         print("不存在该文件")
 
                     for line in lines:
-                            line = line.strip()
-                            crawl_info = crawl_company(line,1)#这里没有传递proxies，故不启用
+                        line = line.strip()
+                        crawl_company(line,1)#这里没有传递proxies，故不启用代理池
 
                 ############################直接爬fofa########################################
                 ############################代理池爬ip138取IP##################################
@@ -99,6 +99,33 @@ if __name__ == "__main__":
                 filter_urls(file_name)
                 time.sleep(1)
             ############################批量检测存活#######################################
+            ############################根域名复查权重#######################################
+            if choice == "5":#根域名复查权重
+                try:
+                    with open("proxies.txt", "r+") as proxies_input:
+                        proxies = proxies_input.readlines()  # 读代理文件
+                except FileNotFoundError:
+                    print("未检测到代理池文件，请先更新代理池")
+
+                file_name = input("请输入文件名：")
+                try:
+                    with open(file_name, "r+") as file_name_input:
+                        lines = file_name_input.readlines()  # 读要爬的URL列表
+                except FileNotFoundError:
+                    print("不存在该文件")
+
+                unique_lines = []
+                for line in lines:
+                    line = line.strip()
+                    main_domain = extract_main_domain(line)
+                    if main_domain not in unique_lines:
+                        unique_lines.append(main_domain)#将主域名排重
+
+
+                for unique_line in unique_lines:
+                    crawl_info = crawl_company(unique_line, 0, proxies,0)  # 0代表用ip138
+
+            ############################根域名复查权重#######################################
         ###################批量操作########################
 
         if opear == "3":#更新代理池
@@ -190,7 +217,7 @@ if __name__ == "__main__":
                 print("-----------目前域名------------")
         if opear == "8":#补天自动化提交
             domain = input("请输入存在漏洞的域名：")
-            type = {"1": "CSRF", "2": "SQL注入", "3": "反射型XSS", "4": "信息泄露", "5": "弱口令"}
+            type = {"1": "逻辑漏洞", "2": "SQL注入", "3": "XSS", "4": "信息泄露", "5": "弱口令","6":"代码执行"}
             choice = input(f"请选择漏洞类型:{type}:")
             leak_type = type[choice]
 
