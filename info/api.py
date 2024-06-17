@@ -240,6 +240,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
             province = re.findall(r"(.+)市",address)[0]
             city = re.findall(r"市(.+)",address)[0]
+            area = ""
         elif "西藏自治区" in address:
             province = "西藏"
             city = re.findall(r"区(.+)",address)[0]
