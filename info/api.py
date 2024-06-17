@@ -165,6 +165,15 @@ def crawl_company(line,fofa=0,proxies=0):#fofa=0代表不启用fofa,proxies默�
                 output.write(content + "\n")
     ###################传参域名才执行该步骤##########################
 
+def extract_district(text):#提取区
+    pattern = r'([\u4e00-\u9fa5]+省)?([\u4e00-\u9fa5]+市)([\u4e00-\u9fa5]+区|市)'
+    match = re.search(pattern, text)
+    if match:
+        district = match.group(3)
+        return district
+    else:
+        return None
+
 def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     chrome_options_area = webdriver.ChromeOptions()
@@ -198,7 +207,10 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
             exit()
 
         html = aiqicha_driver.page_source
-        aiqicha_driver.get_screenshot_as_file(f"aiqicha_{company_name}.png")
+
+        if picture == 1:
+            aiqicha_driver.get_screenshot_as_file(f"aiqicha_{company_name}.png")#截图
+
         html_tree = etree.HTML(html)
         elements = html_tree.xpath("//div[@class='wrap']/a")[0].get("data-log-title")#获取第一个超链接跳转地址
         detail_page = "/company_detail_" + str(re.findall(r"\d.+",elements)[0])
@@ -234,8 +246,10 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         else:
             province = re.findall(r"(.+)省",address)[0]
             city = re.findall(r"省(.+)市",address)[0]
+            area = extract_district(address)
+
         aiqicha_driver.quit()
-        return {"money":money,"province":province,"city":city,"division":division,"phone_number":phone_number}
+        return {"money":money,"province":province,"city":city,"area":area,"division":division,"phone_number":phone_number}
 
     else:
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
@@ -245,8 +259,11 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
             EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
         )#等待元素
 
+        input("如需获取电话号码，请继续登录，登陆完毕输入任意字符继续：")
+
         cookies = aiqicha_driver.get_cookies()
         with open("aiqicha_cookies.txt","w+") as output:
             output.write(str(cookies))
         print("写入cookie完成，请重启我")
         aiqicha_driver.quit()
+        exit()
