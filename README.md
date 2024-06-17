@@ -22,7 +22,8 @@ Linux安装chrome拓展:
 ![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
 ![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)
 ![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)
-![avfcc-i9nt1](https://github.com/1607131160/src_script/assets/128038117/87e092d4-c156-48f2-ab29-2e80aa798e83)
+![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)
+
 
 
 
