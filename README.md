@@ -24,15 +24,11 @@ Linux安装chrome拓展:
 希望黑客们点个star！万分感谢！！！  
   
 使用截图：  
-![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)
-![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)
-![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)
-![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)
-
-
-
-
-
+![pic1](https://github.com/1607131160/src_script/assets/128038117/b1be191b-2352-42fd-acaf-f2605ca22bfa)  
+![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)  
+![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)  
+![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
+  
 版本：v0.1.0  
 一.添加补天半自动化提交功能  
 二.接口aiqicha_get返回字典添加area行政区划键值  
