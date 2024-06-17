@@ -90,12 +90,16 @@ def butian_src_page(domain,leak_type,leak_url):
         actions.send_keys_to_element(element, description[leak_type]).pause(1).perform()
 
         element = driver_butian.find_element(By.XPATH, f"//textarea[@id='repair_suggest']")#修复方案
-        actions.send_keys_to_element(element, description[leak_type]).pause(1).perform()
+        actions.send_keys_to_element(element, suggestions[leak_type]).pause(1).perform()
+
 
         dict_change = {"科技推广和应用服务业":"科学研究和技术服务业"}
         s1 = Select(driver_butian.find_element(By.ID, "industry1"))#所属行业
         s1.select_by_visible_text(dict_change[area_dict["division"]])
 
+        division_type = {'科技推广和应用服务业':'335'}
+        element = WebDriverWait(driver_butian, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='{division_type[area_dict['division']]}']")))
+        actions.click(element).perform()
 
         select_elements = driver_butian.find_elements(By.ID, "selec1")#所属地区-省
         for select in select_elements:
@@ -106,26 +110,43 @@ def butian_src_page(domain,leak_type,leak_url):
                     dropdown.select_by_visible_text(option.text)
                     break
 
-        select_elements = driver_butian.find_elements(By.ID, "selec2")#所属地区-省
-        for select in select_elements:
-            dropdown = Select(select)
-            options = dropdown.options
-            for option in options:
-                if area_dict['city'] in option.text:
-                    dropdown.select_by_visible_text(option.text)
-                    break
+        special = ['北京','上海','重庆','天津']
+        if area_dict["province"] not in special:#四个特殊地区单独选择
+            select_elements = driver_butian.find_elements(By.ID, "selec2")#所属地区-市
+            for select in select_elements:
+                dropdown = Select(select)
+                options = dropdown.options
+                for option in options:
+                    if area_dict['city'] in option.text:
+                        dropdown.select_by_visible_text(option.text)
+                        break
 
-        select_elements = driver_butian.find_elements(By.ID, "selec3")#所属地区-区
-        for select in select_elements:
-            dropdown = Select(select)
-            options = dropdown.options
-            for option in options:
-                if area_dict['area'] in option.text:
-                    dropdown.select_by_visible_text(option.text)
-                    break
+            select_elements = driver_butian.find_elements(By.ID, "selec3")#所属地区-区
+            for select in select_elements:
+                dropdown = Select(select)
+                options = dropdown.options
+                for option in options:
+                    if area_dict['area'] in option.text:
+                        dropdown.select_by_visible_text(option.text)
+                        break
 
-        element = driver_butian.find_element(By.XPATH, f"//input[@placeholder='厂商联系方式']")#厂商联系方式
+        else:#四个地区在里面就这样选
+            s1 = Select(driver_butian.find_element(By.ID, "selec2"))#所属地区-市
+            s1.select_by_index(1)
+
+            select_elements = driver_butian.find_elements(By.ID, "selec3")#所属地区-区
+            for select in select_elements:
+                dropdown = Select(select)
+                options = dropdown.options
+                for option in options:
+                    if area_dict['city'] in option.text:
+                        dropdown.select_by_visible_text(option.text)
+                        break
+
+        element = driver_butian.find_element(By.XPATH, f"//input[@placeholder='厂商联系方式']")  # 厂商联系方式
         actions.send_keys_to_element(element, area_dict['phone_number']).pause(1).perform()
+
+
 
         input()
     else:
