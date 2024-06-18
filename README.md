@@ -3,7 +3,7 @@
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
-目前建议使用CentOS7，其他系统未经调试，很大概率有BUG  
+目前建议使用CentOS7，Debian11，其他系统未经调试，很大概率有BUG，其中debian11命令有点多  
   
 # Windows安装chrome拓展：  
   
@@ -15,7 +15,9 @@ CentOS7:
   
 `sudo yum install google-chrome-stable --nogpg`  
   
-Debian：  
+`pip3 install -r requirements.txt`  
+  
+Debian11：  
   
 `wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -`  
   
@@ -24,6 +26,11 @@ Debian：
 `sudo apt update`  
   
 `sudo apt install google-chrome-stable`  
+
+`sudo mv /usr/lib/python3.x/EXTERNALLY-MANAGED /usr/lib/python3.x/EXTERNALLY-MANAGED.bk`  
+
+注意python版本号写你自己的别直接抄，不知道到底是多少可以进/user/lib看看：  
+`find /usr/lib/ -type d -name "*python*"`  
   
 谷歌爬取需设置代理走socks5(在info/google.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
