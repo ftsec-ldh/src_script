@@ -12,23 +12,10 @@ windows-chrome版本为122，版本不一致请自行更改driver版本
 https://googlechromelabs.github.io/chrome-for-testing/  
 
 # CentOS7安装chrome拓展：
-  
-`sudo tee /etc/yum.repos.d/google-chrome.repo > /dev/null <<EOF
-[google-chrome]
-name=google-chrome
-baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64
-enabled=1
-gpgcheck=1
-gpgkey=https://dl.google.com/linux/linux_signing_key.pub
-EOF`  
-  
-`sudo yum install google-chrome-stable --nogpg`  
-如果提示glibc版本问题可以尝试手动安装google-chrome-stable-91.0.4472.77-1.x86_64.rpm  
-  
-# CentOS7手动安装方法：
+一定要下载91.0.4472的版本
 https://www.chromedownloads.net/chrome64linux-stable/  
-sudo yum install ./google-chrome-stable-91.0.4472.77-1.x86_64.rpm
-即可安装
+`yum install ./google-chrome-stable_current_x86_64.rpm`  
+即可安装  
   
 谷歌爬取需设置代理走socks5(在info/google.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
