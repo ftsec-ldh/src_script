@@ -2,7 +2,7 @@
 脚本推荐使用python3.8或以上  
 selenium版本只支持4.0或以上  
 windows-chrome版本为122  
-linux-chrome版本为91.0.4472
+linux-chrome版本为91.0.4472  
 版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
 补天、漏洞盒子半自动化只支持Windows  
