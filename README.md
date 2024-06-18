@@ -1,7 +1,9 @@
 # 自写的src开源脚本
 脚本推荐使用python3.8或以上  
 selenium版本只支持4.0或以上  
-windows-chrome版本为122，版本不一致请自行更改driver版本  
+windows-chrome版本为122  
+linux-chrome版本为91.0.4472
+版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
 补天、漏洞盒子半自动化只支持Windows  
 建议使用windows操作，如果非要使用Linux：推荐CentOS7
@@ -12,7 +14,7 @@ windows-chrome版本为122，版本不一致请自行更改driver版本
 https://googlechromelabs.github.io/chrome-for-testing/  
 
 # CentOS7安装chrome拓展：
-一定要下载91.0.4472的版本
+下载91.0.4472的版本
 https://www.chromedownloads.net/chrome64linux-stable/  
 `yum install ./google-chrome-stable_current_x86_64.rpm`  
 即可安装  
