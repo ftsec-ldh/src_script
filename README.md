@@ -4,14 +4,18 @@ selenium版本只支持4.0或以上
 windows-chrome版本为122，版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
   
-Windows安装chrome拓展：  
+# Windows安装chrome拓展：  
   
 https://googlechromelabs.github.io/chrome-for-testing/  
   
-Linux安装chrome拓展:  
+# Linux安装chrome拓展:  
+  
 CentOS7:  
+  
 `sudo yum install google-chrome-stable --nogpg`  
+  
 Debian：  
+  
 `wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -`  
 `sudo sh -c ‘echo “deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main” >> /etc/apt/sources.list.d/google.list’`  
 `sudo apt install google-chrome-stable`  
