@@ -1,5 +1,5 @@
 import re,platform,time,requests,os,glob
-from info.api import crawl_company,get_main,extract_main_domain
+from info.api import crawl_company,get_main,extract_main_domain,get_rank
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_login,vulbox_src_page
@@ -25,7 +25,7 @@ if __name__ == "__main__":
        ###################批量操作########################
         if opear == "2":
             print("------------------------------------------")
-            choice = input('''(1)记录权重、单位名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重：''')
+            choice = input('''(1)记录权重、单位名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重(只支持方法1导出的文件格式)\n(6)批量提取权重站点：''')
             if choice == "1":
                 print("------------------------------------------")
                 choice = input("(1)fofa(有次数限制)\n(2)ip138(需要代理池防拉黑)\n请输入爬取的引擎：")
@@ -61,13 +61,14 @@ if __name__ == "__main__":
                     for line in lines:
                         while True:
                             line = line.strip()
-                            crawl_info = crawl_company(line,0,proxies)#0代表用ip138
+                            crawl_info = crawl_company(line,0,proxies,0)#arg2=0代表用ip138,arg4=0代表不复查主域
                             if "error" in str(crawl_info):
                                 print(f"检测到代理池异常{str(crawl_info)}，已自动删除并开始重新爬取")
                                 error_proxy = "".join(re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:.+",str(crawl_info)))
                                 proxies.remove(error_proxy + "\n")#删除报错的代理池
                             else:
                                 break
+                    exit()
                 ############################代理池爬ip138取IP##################################
             ############################批量域名取IP#######################################
             if choice == "2":
@@ -100,17 +101,11 @@ if __name__ == "__main__":
                 time.sleep(1)
             ############################批量检测存活#######################################
             ############################根域名复查权重#######################################
-            if choice == "5":#根域名复查权重
-                try:
-                    with open("proxies.txt", "r+") as proxies_input:
-                        proxies = proxies_input.readlines()  # 读代理文件
-                except FileNotFoundError:
-                    print("未检测到代理池文件，请先更新代理池")
-
+            if choice == "5":#根域名复查权重，防止主域名比二级域名权重高
                 file_name = input("请输入文件名：")
                 try:
                     with open(file_name, "r+") as file_name_input:
-                        lines = file_name_input.readlines()  # 读要爬的URL列表
+                        lines = file_name_input.readlines()#读要爬的URL列表
                 except FileNotFoundError:
                     print("不存在该文件")
 
@@ -123,9 +118,33 @@ if __name__ == "__main__":
 
 
                 for unique_line in unique_lines:
-                    crawl_info = crawl_company(unique_line, 0, proxies,0)  # 0代表用ip138
+                    crawl_company(unique_line,0,0,1)
 
             ############################根域名复查权重#######################################
+            ############################批量提取权重网站主域名#######################################
+            if choice == "6":#批量提取权重网站主域名
+                file_name = input("请输入文件名：")
+                try:
+                    with open(file_name, "r+") as file_name_input:
+                        lines = file_name_input.readlines()  # 读要爬的URL列表
+                except FileNotFoundError:
+                    print("不存在该文件")
+
+                unique_lines = []
+                for line in lines:
+                    line = line.strip().replace("https://","").replace("http://","")
+                    line = extract_main_domain(line)
+                    if line not in unique_lines:
+                        unique_lines.append(line)#将主域名排重
+
+                for unique_line in unique_lines:
+                    ranks = get_rank(unique_line)
+                    if int(ranks[0]) != 0 or int(ranks[1]) != 0 or int(ranks[2])!= 0 or int(ranks[3]) != 0 or int(ranks[4]) != 0 or int(ranks[5]) >= 3:
+                        with open("权重网站集合.txt","a+") as output_file:
+                            output_file.write(f"{unique_line}\n")
+                    print(f"{unique_line}{ranks}")
+
+            ############################批量提取权重网站主域名#######################################
         ###################批量操作########################
 
         if opear == "3":#更新代理池
