@@ -3,6 +3,7 @@
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
+目前建议使用CentOS7，其他系统未经调试，很大概率有BUG  
   
 # Windows安装chrome拓展：  
   
