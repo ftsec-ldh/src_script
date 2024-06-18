@@ -3,6 +3,7 @@
 selenium版本只支持4.0或以上  
 windows-chrome版本为122，版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
+补天、漏洞盒子半自动化只支持Windows  
 建议使用windows操作，如果非要使用Linux：只支持CentOS7，Debian11  
 其他系统未经调试，很大概率有BUG  
 
