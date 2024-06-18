@@ -35,7 +35,11 @@ https://www.chromedownloads.net/chrome64linux-stable/
 ![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)  
 ![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)  
 ![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
-# 更新内容
+# 更新内容  
+版本：v0.1.2  
+一、添加URL批量提取权重网站
+二、优化Linux跨平台glibc兼容性(降低chrome到91)
+  
 版本：v0.1.1  
 一.添加多级域名取主域名权重功能(防止二级域名及以上无权重，主域有权重的情况)<br>检查文件格式必须满足批量记录权重、单位名生成的txt格式  
   
