@@ -22,7 +22,7 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF`  
   
-`sudo yum install google-chrome-stable --nogpg`  
+`sudo yum install google-chrome-stable-91.0.4472.77-1.x86_64.rpm`  
   
 谷歌爬取需设置代理走socks5(在info/google.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
