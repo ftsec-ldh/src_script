@@ -39,9 +39,11 @@ chrome_options.add_argument("--disable-extensions")
 s = Service(driver_path)
 driver = webdriver.Chrome(service=s, options=chrome_options)
 
-#将提取到的域名再取主域名查权重，防止主域名比二级域名权重高
+#将提取到的域名再取主域名查权重
 def extract_main_domain(line):
     def get_main_domain(domain):
+        # 移除域名中的端口号（如果有）
+        domain = domain.split(':')[0]
         parts = domain.split('.')
         if len(parts) < 2:
             return domain
@@ -65,6 +67,10 @@ def extract_main_domain(line):
             if domain_match:
                 domain = domain_match.group(1)
                 return get_main_domain(domain)
+    else:
+        # 如果不是以ip或站点开头，直接处理整个行为一个域名
+        return get_main_domain(line.strip())
+
     return None
 
 
@@ -173,12 +179,9 @@ def crawl_company(line,fofa=0,proxies=0,again=0):#fofa=0不启用fofa | proxies�
             content = f"ip：{line}，域名：{domain},公司名：{name}, 权重：{rank}"
             print(content, end="\n")
             if "-" not in name and len(name) != 0:
-                if again == 0:
-                    with open("公司权重.txt", "a+") as output:
-                        output.write(content + "\n")
-                elif again == 1:
-                    with open("主域名查权重.txt", "a+") as output:
-                        output.write(content + "\n")
+                with open("公司权重.txt", "a+") as output:
+                    output.write(content + "\n")
+
         if domain == False:#无结果
             print(line.replace("http://", "").replace("https://", "") + "未绑定域名，跳过此次查询", end="\n")
 
@@ -192,8 +195,12 @@ def crawl_company(line,fofa=0,proxies=0,again=0):#fofa=0不启用fofa | proxies�
         content = f"站点：{line},公司名：{name}, 权重：{get_rank(line)}"
         print(content, end="\n")
         if "-" not in name and len(name) != 0:
-            with open("公司权重.txt", "a+") as output:
-                output.write(content + "\n")
+            if again == 0:
+                with open("公司权重.txt", "a+") as output:
+                    output.write(content + "\n")
+            if again == 1:
+                with open("主域名查权重.txt", "a+") as output2:
+                    output2.write(content + "\n")
     ###################传参域名才执行该步骤##########################
 
 def extract_district(text):#提取区
