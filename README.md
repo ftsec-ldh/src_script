@@ -10,6 +10,10 @@ windows-chrome版本为122，版本不一致请自行更改driver版本
 # Windows安装chrome拓展：  
   
 https://googlechromelabs.github.io/chrome-for-testing/  
+
+# CentOS7安装chrome拓展：
+
+`sudo yum install google-chrome-stable --nogpg`  
   
 谷歌爬取需设置代理走socks5(在info/google.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
