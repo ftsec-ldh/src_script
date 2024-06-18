@@ -4,3 +4,4 @@ bs4==0.0.1
 mmh3==4.1.0
 pyperclip
 lxml
+pandas
