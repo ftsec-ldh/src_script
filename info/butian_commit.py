@@ -144,12 +144,15 @@ def butian_src_page(domain,leak_type,leak_url):
                 dropdown = Select(select)
                 options = dropdown.options
                 for option in options:
-                    if area_dict['area'] in option.text:
-                        dropdown.select_by_visible_text(option.text)
-                        break
+                    try:
+                        if area_dict['area'] in option.text:
+                            dropdown.select_by_visible_text(option.text)
+                            break
+                    except Exception:
+                        print("该域名所属地区未知，如爱企查显示有行业则说明配置丢失")
 
         else:#四个地区在里面就这样选
-            s1 = Select(driver_butian.find_element(By.ID, "selec2"))#所属地区-市
+            s1 = Select(driver_butian.find_element(By.ID, "selec2"))#所属地区-4个特殊城市+城区
             s1.select_by_index(1)
 
             select_elements = driver_butian.find_elements(By.ID, "selec3")#所属地区-区
