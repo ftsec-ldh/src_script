@@ -4,36 +4,12 @@ selenium版本只支持4.0或以上
 windows-chrome版本为122，版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
 补天、漏洞盒子半自动化只支持Windows  
-建议使用windows操作，如果非要使用Linux：只支持CentOS7，Debian11  
-其他系统未经调试，很大概率有BUG  
-
+建议使用windows操作，如果非要使用Linux：推荐CentOS7
+其他系统未经调试  
   
 # Windows安装chrome拓展：  
   
 https://googlechromelabs.github.io/chrome-for-testing/  
-  
-# Linux安装chrome拓展:  
-  
-CentOS7:  
-  
-`sudo yum install google-chrome-stable --nogpg`  
-  
-`pip3 install -r requirements.txt`  
-  
-Debian11：  
-  
-`wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -`  
-  
-`sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'`  
-
-`sudo apt update`  
-  
-`sudo apt install google-chrome-stable`  
-
-`sudo mv /usr/lib/python3.x/EXTERNALLY-MANAGED /usr/lib/python3.x/EXTERNALLY-MANAGED.bk`  
-
-注意python版本号写你自己的别直接抄，不知道到底是多少可以进/user/lib看看：  
-`find /usr/lib/ -type d -name "*python*"`  
   
 谷歌爬取需设置代理走socks5(在info/google.py中设置)  
 代理池更新：请使用前在conf/proxies.conf中设置好代理池接口  
