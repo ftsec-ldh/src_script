@@ -103,7 +103,6 @@ def get_rank(url):
 
     driver.get(url)
     text = driver.page_source
-    time.sleep(1)
 
     rank_bd = "".join(re.findall(r"<img src=\"//statics.aizhan.com/images/br/(.*?).png", text))
     rank_yd = "".join(re.findall(r"<img src=\"//statics.aizhan.com/images/mbr/(.*?).png", text))
