@@ -103,6 +103,7 @@ def get_rank(url):
 
     driver.get(url)
     text = driver.page_source
+    time.sleep(1)
 
     rank_bd = "".join(re.findall(r"<img src=\"//statics.aizhan.com/images/br/(.*?).png", text))
     rank_yd = "".join(re.findall(r"<img src=\"//statics.aizhan.com/images/mbr/(.*?).png", text))
@@ -216,6 +217,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     chrome_options_area = webdriver.ChromeOptions()
     chrome_options_area.add_argument(f"user-agent={user_agent}")
+    chrome_options_area.add_argument("--headless")
     aiqicha_driver = webdriver.Chrome(service=s,options=chrome_options_area)
 
     if os.path.exists("aiqicha_cookies.txt"):
