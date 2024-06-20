@@ -139,10 +139,15 @@ if __name__ == "__main__":
 
                 for unique_line in unique_lines:
                     ranks = get_rank(unique_line)
-                    if int(ranks[0]) != 0 or int(ranks[1]) != 0 or int(ranks[2])!= 0 or int(ranks[3]) != 0 or int(ranks[4]) != 0 or int(ranks[5]) >= 3:
-                        with open("权重网站集合.txt","a+") as output_file:
-                            output_file.write(f"{unique_line}\n")
+                    try:
+                        if int(ranks[0]) != 0 or int(ranks[1]) != 0 or int(ranks[2])!= 0 or int(ranks[3]) != 0 or int(ranks[4]) != 0 or int(ranks[5]) >= 3:
+                            with open("权重网站集合.txt","a+") as output_file:
+                                output_file.write(f"{unique_line}\n")
+                    except Exception:
+                        pass
                     print(f"{unique_line}{ranks}")
+
+
 
             ############################批量提取权重网站主域名#######################################
         ###################批量操作########################
