@@ -23,6 +23,8 @@ class URLChecker(threading.Thread):
         self.output_file = output_file
 
     def run(self):
+        if "http://" not in self.url and "https://" not in self.url:
+            self.url = "http://" + self.url
         if check_alive(self.url):
             print(f"{self.url} is alive")
             with open(self.output_file, 'a') as file:
