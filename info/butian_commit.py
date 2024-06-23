@@ -99,7 +99,8 @@ def butian_src_page(domain,leak_type,leak_url):
 
         dict_change = {
             "科技推广和应用服务业":"科学研究和技术服务业",
-            "软件和信息技术服务业":"信息传输、软件和信息技术服务业"
+            "软件和信息技术服务业":"信息传输、软件和信息技术服务业",
+            "文化艺术业":"文化、体育和娱乐业"
                        }
         try:
             s1 = Select(driver_butian.find_element(By.ID, "industry1"))#所属行业
@@ -112,6 +113,7 @@ def butian_src_page(domain,leak_type,leak_url):
             '软件和信息技术服务业':"330",
             '互联网和相关服务':"331",
             '电信、广播电视和卫星传输服务':"30",
+            "文化艺术业":"78"
         }
         try:#行业分类checkbox
             element = WebDriverWait(driver_butian, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='{division_type[area_dict['division']]}']")))
