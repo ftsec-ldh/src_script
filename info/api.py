@@ -216,8 +216,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     chrome_options_area = webdriver.ChromeOptions()
     chrome_options_area.add_argument(f"user-agent={user_agent}")
-    chrome_options_area.add_argument("--headless")
-    aiqicha_driver = webdriver.Chrome(service=s,options=chrome_options_area)
+    aiqicha_driver = webdriver.Chrome(service=s, options=chrome_options_area)
 
     if os.path.exists("aiqicha_cookies.txt"):
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
@@ -231,6 +230,8 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
                 aiqicha_driver.add_cookie(cookie)
             except Exception:
                 pass
+
+
 
         aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
         try:
