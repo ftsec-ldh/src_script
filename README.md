@@ -36,6 +36,10 @@ https://www.chromedownloads.net/chrome64linux-stable/
 ![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)  
 ![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
 # 更新内容  
+  
+版本：v0.1.3  
+一、添加xray+crawlergo联合扫描功能  
+  
 版本：v0.1.2  
 一、添加URL批量提取权重网站(与方法2-1区别是提取的是主域名，方便用来做资产测绘)  
 二、优化Linux跨平台glibc兼容性(降低chrome到91)  
