@@ -10,10 +10,31 @@ from filter.cls_repeat_ip import remove_duplicates
 from filter.check_alive import filter_urls
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
+from scan.xray_scan_urls import scan_urls
+
+with open("conf/dirsearch.conf", encoding="utf-8") as input_file:
+    dirsearch_path = input_file.read()
+if not dirsearch_path.endswith("/"):
+    dirsearch_path = dirsearch_path + "\\"
+
+with open("conf/oneforall.conf", encoding="utf-8") as input_file:
+    oneforall_path = input_file.read()
+if not oneforall_path.endswith("/"):
+    oneforall_path = oneforall_path + "\\"
+
+with open("conf/xray.conf", encoding="utf-8") as input_file:
+    xray_path = input_file.read()
+if not xray_path.endswith("/"):
+    xray_path = xray_path + "\\"
+
+with open("conf/crawlergo.conf", encoding="utf-8") as input_file:
+    crawlergo_path = input_file.read()
+if not crawlergo_path.endswith("/"):
+    crawlergo_path = crawlergo_path + "\\"
 
 if __name__ == "__main__":
     while True:
-        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n请选择操作数：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n(9)xray一键扫描\n请选择操作数：")
         #################爬谷歌内容###########################
         if opear == "1":
             print("------------------------------------------")
@@ -147,8 +168,6 @@ if __name__ == "__main__":
                         pass
                     print(f"{unique_line}{ranks}")
 
-
-
             ############################批量提取权重网站主域名#######################################
         ###################批量操作########################
 
@@ -207,18 +226,9 @@ if __name__ == "__main__":
             else:
                 print("请输入正确的类型")
                 continue
-            with open("conf/dirsearch.conf",encoding="utf-8") as input_file:
-                dirsearch_path = input_file.read()
-            if not dirsearch_path.endswith("/"):
-                dirsearch_path = dirsearch_path + "\\"
             dirscan(dirsearch_path,url,thread,language,proxies)#正式开始扫描
 
         if opear == "7":#子域收集
-            with open("conf/oneforall.conf", encoding="utf-8") as input_file:
-                oneforall_path = input_file.read()
-            if not oneforall_path.endswith("/"):
-                oneforall_path = oneforall_path + "\\"
-
             choice = input("(1)oneforall单目标扫描\n(2)oneforall多目标扫描\n(3)提取单个域名\n(4)提取所有域名\n(5)查看目前收集域名：")
             if choice == "1":
                 url = input("请输入要收集的域名：")
@@ -247,3 +257,15 @@ if __name__ == "__main__":
 
             leak_url = input("请输入漏洞url:")
             butian_src_page(domain, leak_type, leak_url)
+
+        if opear == "9":#xray一键扫描
+            file_name = input("请输入文件名：")
+
+            with open(file_name, "r+") as input_file:
+                cmd = 0
+                for text in input_file.readlines():
+                    data1 = text.strip('\n')
+                    if "http://" not in data1 and "https://" not in data1:
+                        data1 = "http://" + data1
+                    scan_urls(data1,xray_path,crawlergo_path,cmd)
+                    cmd = cmd + 1
