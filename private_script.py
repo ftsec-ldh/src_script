@@ -6,11 +6,14 @@ from info.vulbox_commit import vulbox_login,vulbox_src_page
 from info.butian_commit import butian_login,butian_src_page
 from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip
-from filter.cls_repeat_ip import remove_duplicates
+from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
 from filter.check_alive import filter_urls
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
 from scan.xray_scan_urls import scan_urls
+from scan.port_scan import scan_ports_socket
+from scan.port_scan import scan_web_ports
+
 
 with open("conf/dirsearch.conf", encoding="utf-8") as input_file:
     dirsearch_path = input_file.read()
@@ -46,7 +49,8 @@ if __name__ == "__main__":
        ###################批量操作########################
         if opear == "2":
             print("------------------------------------------")
-            choice = input('''(1)记录权重、单位名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重(只支持方法1导出的文件格式)\n(6)批量提取权重站点：''')
+            choice = input('''(1)批量取权重、公司名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重(只支持方法1导出的文件格式)\n(6)批量提取权重站点
+(7)批量提取xray结果目标\n(8)批量扫描web端口\n(9)解析排除重复IP：''')
             if choice == "1":
                 print("------------------------------------------")
                 choice = input("(1)fofa(有次数限制)\n(2)ip138(需要代理池防拉黑)\n请输入爬取的引擎：")
@@ -167,8 +171,51 @@ if __name__ == "__main__":
                     except Exception:
                         pass
                     print(f"{unique_line}{ranks}")
-
             ############################批量提取权重网站主域名#######################################
+            ############################批量提取xray结果目标(去重)#######################################
+            if choice == "7":  # 批量提取xray html中的IP
+
+                file_name = input("请输入文件名(xxx.html)：")
+
+                with open(file_name,"r+",encoding="utf-8") as input_file:
+                    content = input_file.read()
+                targets = re.findall('\{"addr":"(.*?)","payload',content)
+
+                unique_targets = []
+                for i in targets:
+                    target_ip = get_main(i)
+                    if target_ip not in unique_targets:
+                        unique_targets.append(target_ip)
+
+                for i in unique_targets:
+                    with open("xray_targets.txt","a+") as output_file:
+                        output_file.write(i + "\n")
+            ############################批量提取xray结果目标(去重)#######################################
+            ############################批量扫描web端口#######################################
+            if choice == "8":#批量扫描web端口
+                file_name = input("请输入文件名：")
+
+                with open(file_name,"r+") as input_file:
+                    urls = input_file.readlines()
+
+                port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
+                               8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+                               7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
+                               888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
+
+                for line in urls:
+                    ip_address = get_main(line).strip()
+                    open_ports = scan_ports_socket(ip_address, port_number)
+                    for i in scan_web_ports(ip_address, open_ports):
+                        with open("open_web_ports.txt", "a+") as output_file:
+                            output_file.write(f"{ip_address}:{i}\n")
+            ############################批量扫描web端口#######################################
+            ############################批量解析排除重复ip#######################################
+            if choice == "9":#批量解析排除重复ip
+                file_name = input("请输入文件名：")
+                remove_same_ip(file_name)
+                pass
+            ############################批量解析排除重复ip#######################################
         ###################批量操作########################
 
         if opear == "3":#更新代理池
