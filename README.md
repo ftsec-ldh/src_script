@@ -37,6 +37,10 @@ https://www.chromedownloads.net/chrome64linux-stable/
 ![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
 # 更新内容  
   
+版本：v0.1.4  
+一、添加端口扫描并保存到txt功能  
+二、添加解析域名ip排重功能  
+  
 版本：v0.1.3  
 一、添加xray+crawlergo联合扫描功能  
   
