@@ -10,34 +10,35 @@ from bs4 import BeautifulSoup
 import os,base64
 from lxml import etree
 
-with open("conf/proxies.conf") as proxy_input:
-    proxy_server = proxy_input.read().strip()#proxypool服务器
+if __name__ == "__main__":
+    with open("conf/proxies.conf") as proxy_input:
+        proxy_server = proxy_input.read().strip()  # proxypool服务器
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-system = platform.system()
+    system = platform.system()
 
-if system =="Windows":
-    driver_path = r'drivers\win64\chromedriver.exe'
-if system =="Linux":
-    driver_path = r'drivers/linux64/chromedriver'
+    if system == "Windows":
+        driver_path = r'drivers\win64\chromedriver.exe'
+    if system == "Linux":
+        driver_path = r'drivers/linux64/chromedriver'
 
-headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.72 Safari/537.36'}
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.72 Safari/537.36'}
 
-api_url = "https://www.aizhan.com/cha/"#查权重的接口
-api_url2 = "http://site.ip138.com/"#反查域名的接口
-api_url3 = "https://aiqicha.baidu.com/s?q="#查公司注册资金的接口
+    api_url = "https://www.aizhan.com/cha/"  # 查权重的接口
+    api_url2 = "http://site.ip138.com/"  # 反查域名的接口
+    api_url3 = "https://aiqicha.baidu.com/s?q="  # 查公司注册资金的接口
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("no-sandbox")
-chrome_options.add_argument("--disable-extensions")
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("no-sandbox")
+    chrome_options.add_argument("--disable-extensions")
 
-
-s = Service(driver_path)
-driver = webdriver.Chrome(service=s, options=chrome_options)
+    s = Service(driver_path)
+    driver = webdriver.Chrome(service=s, options=chrome_options)
 
 #将提取到的域名再取主域名查权重
 def extract_main_domain(line):
