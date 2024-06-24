@@ -6,3 +6,4 @@ pyperclip
 lxml
 pandas
 simplejson
+fake_useragent
