@@ -5,3 +5,4 @@ mmh3==4.1.0
 pyperclip
 lxml
 pandas
+simplejson
