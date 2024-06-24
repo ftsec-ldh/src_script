@@ -32,7 +32,7 @@ def scan_port_web(ip, port):
     try:
         response = requests.get(url, timeout=3)#发送GET请求
         content = response.text.strip()#获取网页内容并去除首尾空白
-        if content:#如果网页内容不为空
+        if content and response.status_code == 200:#如果网页内容不为空
             return port, True, "Content found"
         else:
             return port, False, "Empty content"
