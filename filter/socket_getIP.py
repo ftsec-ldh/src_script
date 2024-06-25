@@ -1,4 +1,3 @@
-
 import socket
 def domain_to_ip(domain):
     try:
