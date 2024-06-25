@@ -8,11 +8,14 @@ from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
 from filter.check_alive import filter_urls
+from filter.filter_same_web import compare_sites
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
 from scan.xray_scan_urls import scan_urls
 from scan.port_scan import scan_ports_socket
 from scan.port_scan import scan_web_ports
+
+
 
 
 with open("conf/dirsearch.conf", encoding="utf-8") as input_file:
@@ -50,7 +53,7 @@ if __name__ == "__main__":
         if opear == "2":
             print("------------------------------------------")
             choice = input('''(1)批量取权重、公司名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重(只支持方法1导出的文件格式)\n(6)批量提取权重站点
-(7)批量提取xray结果目标\n(8)批量扫描web端口\n(9)解析排除重复IP：''')
+(7)批量提取xray结果目标\n(8)批量扫描web端口\n(9)解析排除重复IP\n(10)批量排除相同页面的子域：''')
             if choice == "1":
                 print("------------------------------------------")
                 choice = input("(1)fofa(有次数限制)\n(2)ip138(需要代理池防拉黑)\n请输入爬取的引擎：")
@@ -216,6 +219,22 @@ if __name__ == "__main__":
                 remove_same_ip(file_name)
                 pass
             ############################批量解析排除重复ip#######################################
+            ############################批量排除相同页面的子域#######################################
+            if choice == "10":#批量排除相同页面的子域
+                file_name = input("请输入文件名：")
+
+                with open(file_name, "r+") as input_file:
+                    sites = input_file.readlines()
+                sites_list = []
+
+                for i in sites:
+                    i = i.strip()
+                    if "http://" not in i and "https://" not in i:
+                        i = "http://" + i
+                    sites_list.append(i)
+
+                compare_sites(sites_list, "unique_sites.txt")
+            ############################批量排除相同页面的子域#######################################
         ###################批量操作########################
 
         if opear == "3":#更新代理池
