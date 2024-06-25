@@ -40,7 +40,7 @@ chrome_options.add_argument("--disable-extensions")
 s = Service(driver_path)
 driver = webdriver.Chrome(service=s, options=chrome_options)
 
-#将提取到的域名再取主域名查权重
+#将提取到的域名取主域名
 def extract_main_domain(line):
     def get_main_domain(domain):
         # 移除域名中的端口号（如果有）
