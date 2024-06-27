@@ -262,7 +262,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         aiqicha_driver.get(f"https://aiqicha.baidu.com/{detail_page}")#使用无头模式这里会被检测到
 
         WebDriverWait(aiqicha_driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//td[preceding-sibling::td[@data-v-bbdd274a='' and contains(text(), '行政区划')]]"))
+            EC.presence_of_element_located((By.XPATH, "//td[preceding-sibling::td[@data-v-3869a30a='' and contains(text(), '行政区划')]]"))
         )#等待元素
 
         html = aiqicha_driver.page_source
@@ -270,7 +270,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
 
         html_tree = etree.HTML(html)
 
-        elements = html_tree.xpath("//td[preceding-sibling::td[@data-v-bbdd274a='' and contains(text(), '行政区划')]]")
+        elements = html_tree.xpath("//td[preceding-sibling::td[@data-v-3869a30a='' and contains(text(), '行政区划')]]")
         address = elements[0].text
 
 
