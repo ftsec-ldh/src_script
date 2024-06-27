@@ -1,7 +1,5 @@
-import requests
-import hashlib
+import requests,hashlib,re,threading
 from urllib.parse import urlparse
-import re
 
 
 def get_main_domain(domain):
@@ -61,3 +59,28 @@ def compare_sites(site_list, output_file):
             else:
                 print(f"Failed to fetch content for {site}")
 
+def thread_cls_web(site,domain_content_dict,output_file):
+    with open(output_file, "a+") as file:
+        domain_name = get_main_domain(get_main(site))
+        content_hash = fetch_content(site)
+        if content_hash:
+            if domain_name not in domain_content_dict:
+                domain_content_dict[domain_name] = {}
+            if content_hash not in domain_content_dict[domain_name]:
+                domain_content_dict[domain_name][content_hash] = site
+                file.write(site + '\n')
+                print(f"Keeping {site} as unique under domain {domain_name}.")
+            else:
+                print(
+                    f"Duplicate found under {domain_name}: {site} is the same as {domain_content_dict[domain_name][content_hash]}")
+        else:
+            print(f"Failed to fetch content for {site}")
+
+def thread_compare_sites(site_list, output_file):
+    domain_content_dict = {}
+    threads = []
+    for site in site_list:
+        thread = threading.Thread(target=thread_cls_web,args=[site,domain_content_dict,output_file])
+        threads.append(thread)
+    for i in threads:
+        i.start()
