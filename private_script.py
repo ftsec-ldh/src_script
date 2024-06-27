@@ -1,4 +1,4 @@
-import re,platform,time,requests,os,glob
+import re,platform,time,requests,os,glob,threading
 from info.api import crawl_company,get_main,extract_main_domain,get_rank
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
@@ -8,15 +8,11 @@ from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
 from filter.check_alive import filter_urls
-from filter.filter_same_web import compare_sites
+from filter.filter_same_web import compare_sites,thread_compare_sites
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
 from scan.xray_scan_urls import scan_urls
-from scan.port_scan import scan_ports_socket
-from scan.port_scan import scan_web_ports
-
-
-
+from scan.port_scan import scan_ports_socket,scan_web_ports,thread_scan_http
 
 with open("conf/dirsearch.conf", encoding="utf-8") as input_file:
     dirsearch_path = input_file.read()
@@ -176,7 +172,7 @@ if __name__ == "__main__":
                     print(f"{unique_line}{ranks}")
             ############################批量提取权重网站主域名#######################################
             ############################批量提取xray结果目标(去重)#######################################
-            if choice == "7":  # 批量提取xray html中的IP
+            if choice == "7":#批量提取xray html中的IP
 
                 file_name = input("请输入文件名(xxx.html)：")
 
@@ -196,22 +192,38 @@ if __name__ == "__main__":
             ############################批量提取xray结果目标(去重)#######################################
             ############################批量扫描web端口#######################################
             if choice == "8":#批量扫描web端口
-                file_name = input("请输入文件名：")
+                choice_thread = input("是否多线程(y/n)：")
 
-                with open(file_name,"r+") as input_file:
-                    urls = input_file.readlines()
+                if choice_thread == "n":
+                    file_name = input("请输入文件名：")
+                    with open(file_name,"r+") as input_file:
+                        urls = input_file.readlines()
 
-                port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
-                               8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
-                               7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-                               888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
+                    port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
+                                   8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+                                   7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
+                                   888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
 
-                for line in urls:
-                    ip_address = get_main(line).strip()
-                    open_ports = scan_ports_socket(ip_address, port_number)
-                    for i in scan_web_ports(ip_address, open_ports):
-                        with open("open_web_ports.txt", "a+") as output_file:
-                            output_file.write(f"{ip_address}:{i}\n")
+                    for line in urls:
+                        ip_address = get_main(line).strip()
+                        open_ports = scan_ports_socket(ip_address, port_number)
+                        for i in scan_web_ports(ip_address, open_ports):
+                            with open("open_web_ports.txt", "a+") as output_file:
+                                output_file.write(f"{ip_address}:{i}\n")
+
+                if choice_thread == "y":
+                    file_name = input("请输入文件名：")
+                    with open(file_name, "r+") as input_file:
+                        urls = input_file.readlines()
+
+                    port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
+                                   8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+                                   7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
+                                   888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
+                    threads = []
+                    for line in urls:
+                        thread_scan_http(line,port_number)
+
             ############################批量扫描web端口#######################################
             ############################批量解析排除重复ip#######################################
             if choice == "9":#批量解析排除重复ip
@@ -225,19 +237,38 @@ if __name__ == "__main__":
             ############################批量解析排除重复ip#######################################
             ############################批量排除相同页面的子域#######################################
             if choice == "10":#批量排除相同页面的子域
-                file_name = input("请输入文件名：")
+                thread_choice = input("是否多线程(y/n)：")
+                if thread_choice == "n":
+                    file_name = input("请输入文件名：")
 
-                with open(file_name, "r+") as input_file:
-                    sites = input_file.readlines()
-                sites_list = []
+                    with open(file_name, "r+") as input_file:
+                        sites = input_file.readlines()
+                    sites_list = []
 
-                for i in sites:
-                    i = i.strip()
-                    if "http://" not in i and "https://" not in i:
-                        i = "http://" + i
-                    sites_list.append(i)
+                    for i in sites:
+                        i = i.strip()
+                        if "http://" not in i and "https://" not in i:
+                            i = "http://" + i
+                        sites_list.append(i)
 
-                compare_sites(sites_list, "unique_sites.txt")
+                    compare_sites(sites_list, "unique_sites.txt")
+
+                if thread_choice == "y":
+                    file_name = input("请输入文件名：")
+
+                    with open(file_name, "r+") as input_file:
+                        sites = input_file.readlines()
+                    sites_list = []
+
+                    for i in sites:
+                        i = i.strip()
+                        if "http://" not in i and "https://" not in i:
+                            i = "http://" + i
+                        sites_list.append(i)
+
+                    thread_compare_sites(sites_list, "unique_sites.txt")
+
+
             ############################批量排除相同页面的子域#######################################
         ###################批量操作########################
 
