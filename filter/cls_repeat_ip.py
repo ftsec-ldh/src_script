@@ -50,9 +50,6 @@ def remove_same_ip(filename,thread=0):
             for line in input_file:
                 line = line.strip()#去除行尾的换行符和空格
                 main = get_main(line)
-
-                ip_pattern = r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
-                ip_match = re.search(ip_pattern, main)
                 with open("无重ip.txt", "a+") as input_file:
                     ip = domain_to_ip(main)
                     if ip not in unique_ip_targets:
