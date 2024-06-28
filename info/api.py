@@ -295,7 +295,6 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
                     phone_number = elements[i].text
                     if phone_number is not None and not bool(re.search(r'[\u4e00-\u9fff]', phone_number)):
                         phone_number = phone_number.replace(".", "").replace(" ", "").strip()
-                        print(phone_number)
                         break
 
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
