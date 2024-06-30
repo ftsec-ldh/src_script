@@ -52,8 +52,8 @@ def butian_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
 
 def butian_src_page(domain,leak_type,leak_url):
     if os.path.exists("butian_cookies.txt"):
-        company_name = get_company(domain, 1)  # 获取公司名
-        area_dict = aiqicha_get(company_name, 1)  # 获取公司地址、注册资金、行业划分
+        company_name = get_company(domain, 1)#获取公司名
+        area_dict = aiqicha_get(company_name, 1)#获取公司地址、注册资金、行业划分
         title = company_name + "页面存在" + leak_type
 
         s = Service("drivers/win64/chromedriver.exe")
@@ -100,8 +100,9 @@ def butian_src_page(domain,leak_type,leak_url):
         dict_change = {
             "科技推广和应用服务业":"科学研究和技术服务业",
             "软件和信息技术服务业":"信息传输、软件和信息技术服务业",
-            "文化艺术业":"文化、体育和娱乐业"
-                       }
+            "文化艺术业":"文化、体育和娱乐业",
+            "电气机械和器材制造业":"制造业",
+            "互联网和相关服务":"信息传输、软件和信息技术服务业"}
         try:
             s1 = Select(driver_butian.find_element(By.ID, "industry1"))#所属行业
             s1.select_by_visible_text(dict_change[area_dict["division"]])
@@ -109,11 +110,12 @@ def butian_src_page(domain,leak_type,leak_url):
             print("该域名所属行业未知，如爱企查显示有行业则说明配置丢失")
 
         division_type = {
+            '电信、广播电视和卫星传输服务': "30",
+            "文化艺术业": "78",
+            "电气机械和器材制造业": "85",
+            '软件和信息技术服务业': "330",
+            '互联网和相关服务': "331",
             '科技推广和应用服务业':"335",
-            '软件和信息技术服务业':"330",
-            '互联网和相关服务':"331",
-            '电信、广播电视和卫星传输服务':"30",
-            "文化艺术业":"78"
         }
         try:#行业分类checkbox
             element = WebDriverWait(driver_butian, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='{division_type[area_dict['division']]}']")))
@@ -165,9 +167,11 @@ def butian_src_page(domain,leak_type,leak_url):
                     if area_dict['city'] in option.text:
                         dropdown.select_by_visible_text(option.text)
                         break
-
-        element = driver_butian.find_element(By.XPATH, f"//input[@placeholder='厂商联系方式']")  # 厂商联系方式
-        actions.send_keys_to_element(element, area_dict['phone_number']).pause(1).perform()
+        try:
+            element = driver_butian.find_element(By.XPATH, f"//input[@placeholder='厂商联系方式']")  # 厂商联系方式
+            actions.send_keys_to_element(element, area_dict['phone_number']).pause(1).perform()
+        except Exception:
+            print("查询电话出错，可能该公司较特殊，请手动查询该公司电话")
 
 
 
