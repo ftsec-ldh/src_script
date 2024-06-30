@@ -37,6 +37,10 @@ https://www.chromedownloads.net/chrome64linux-stable/
 ![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
 # 更新内容 
   
+版本：v0.1.6  
+一、xray扫描功能添加cookie扫描后台选项  
+二、添加补天自动提交行业配置并优化BUG  
+  
 版本：v0.1.5  
 一、添加同一域名页面内容排重功能  
 二、添加多线程方法选择  
