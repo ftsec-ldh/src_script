@@ -7,6 +7,7 @@ lxml
 pandas
 simplejson
 fake_useragent
+ruamel.yaml
 
 beautifulsoup4==4.11.1
 certifi==2022.06.15
