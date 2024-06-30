@@ -11,7 +11,7 @@ from filter.check_alive import filter_urls
 from filter.filter_same_web import compare_sites,thread_compare_sites
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
-from scan.xray_scan_urls import scan_urls
+from scan.xray_scan_urls import scan_urls,scan_urls_cookies
 from scan.port_scan import scan_ports_socket,scan_web_ports,thread_scan_http
 
 with open("conf/dirsearch.conf", encoding="utf-8") as input_file:
@@ -361,12 +361,23 @@ if __name__ == "__main__":
 
         if opear == "9":#xray一键扫描
             file_name = input("请输入文件名：")
-
-            with open(file_name, "r+") as input_file:
-                cmd = 0
-                for text in input_file.readlines():
-                    data1 = text.strip('\n')
-                    if "http://" not in data1 and "https://" not in data1:
-                        data1 = "http://" + data1
-                    scan_urls(data1,xray_path,crawlergo_path,cmd)
-                    cmd = cmd + 1
+            cookie_choice = input("是否导入cookie(y/n)：")
+            if cookie_choice == "n":
+                with open(file_name, "r+") as input_file:
+                    cmd = 0
+                    for text in input_file.readlines():
+                        data1 = text.strip('\n')
+                        if "http://" not in data1 and "https://" not in data1:
+                            data1 = "http://" + data1
+                        scan_urls(data1,xray_path,crawlergo_path,cmd)
+                        cmd = cmd + 1
+            if cookie_choice == "y":
+                print("cookie请到xray_scan_urls.py中与config.yaml中自定义")
+                with open(file_name, "r+") as input_file:
+                    cmd = 0
+                    for text in input_file.readlines():
+                        data1 = text.strip('\n')
+                        if "http://" not in data1 and "https://" not in data1:
+                            data1 = "http://" + data1
+                        scan_urls_cookies(data1,xray_path,crawlergo_path,cmd)
+                        cmd = cmd + 1
