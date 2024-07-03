@@ -157,6 +157,7 @@ if __name__ == "__main__":
                 unique_lines = []
                 for line in lines:
                     line = line.strip().replace("https://","").replace("http://","")
+                    line = get_main(line)
                     line = extract_main_domain(line)
                     if line not in unique_lines:
                         unique_lines.append(line)#将主域名排重
