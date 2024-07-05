@@ -1,7 +1,16 @@
-import socket,requests,re
+import socket,requests,re,threading,hashlib
 from requests.exceptions import ConnectionError, Timeout, RequestException
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import threading
+from info.api import get_main
+import vthread
+
+@vthread.pool(100)
+def thread_scan_http(line,port_number):
+    ip_address = get_main(line).strip()
+    open_ports = scan_ports_socket(ip_address, port_number)
+    for i in scan_web_ports(ip_address, open_ports):
+        with open("open_web_ports.txt", "a+") as output_file:
+            output_file.write(f"{ip_address}:{i}\n")
 
 def scan_port_socket(ip, port, open_ports):
     socket.setdefaulttimeout(1)  # 设置默认超时时间
@@ -24,6 +33,7 @@ def scan_ports_socket(ip, ports):
 
     for thread in threads:
         thread.join()
+
 
     return open_ports
 
@@ -58,3 +68,6 @@ def scan_web_ports(ip, ports):
                 print(f"Port {port} on {ip} is open but returned HTTP status {status}.")
 
     return open_web_ports
+
+def delete_same_web():
+    pass
