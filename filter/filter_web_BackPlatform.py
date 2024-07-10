@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time,platform,vthread
 from lxml import etree
-from bs4 import BeautifulSoup
 
 key_words = ["后台系统","登录"]
 
@@ -40,17 +39,12 @@ def filter_back_platform(url):
     try:
         driver.get(url)
         time.sleep(10)
-
-
         content = driver.page_source
-
-        soup = BeautifulSoup(content, 'html.parser')
-        content = soup.prettify()#将代码格式化再判断行数
 
         lines = content.splitlines()
         line_count = len(lines)
 
-        if (any(keyword in content for keyword in key_words) and 2 < line_count < 900) or (check_password_input(content) and line_count < 900):
+        if (any(keyword in content for keyword in key_words) and 5 < line_count < 700) or (check_password_input(content) and line_count < 700):
             print(f"{url}是后台登录系统  前端代码行数：{line_count}")
             with open("后台.txt","a+") as output_file:
                 output_file.write(url + "\n")
