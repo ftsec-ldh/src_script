@@ -54,7 +54,6 @@ def filter_back_platform(url):
             print(f"{url}是后台登录系统  前端代码行数：{line_count}")
             with open("后台.txt","a+") as output_file:
                 output_file.write(url + "\n")
-            print(content)
         else:
             print(f"{url}不具备后台特征 前端代码行数：{line_count}")
     except Exception as e:
