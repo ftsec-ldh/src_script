@@ -5,10 +5,11 @@ from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_login,vulbox_src_page
 from info.butian_commit import butian_login,butian_src_page
 from info.get_ico_hash import get_hash_byURL,get_hash_byFile
-from filter.socket_getIP import domain_to_ip
+from filter.socket_getIP import domain_to_ip,thread_domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
 from filter.check_alive import filter_urls
 from filter.filter_same_web import compare_sites,thread_compare_sites
+from filter.filter_web_BackPlatform import filter_back_platform
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
 from scan.xray_scan_urls import scan_urls,scan_urls_cookies
@@ -34,6 +35,11 @@ with open("conf/crawlergo.conf", encoding="utf-8") as input_file:
 if not crawlergo_path.endswith("/"):
     crawlergo_path = crawlergo_path + "\\"
 
+port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,91,92,93,94,95,96,97,98,99,100, 443, 4430, 8443, 9043, 8080, 8081, 8082,
+               8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+               7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
+               8888, 8443,9443, 4443, 4433, 3443, 9000, 9200, 10443]  # HTTP端口
+
 if __name__ == "__main__":
     while True:
         opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n(9)xray一键扫描\n请选择操作数：")
@@ -49,7 +55,7 @@ if __name__ == "__main__":
         if opear == "2":
             print("------------------------------------------")
             choice = input('''(1)批量取权重、公司名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重(只支持方法1导出的文件格式)\n(6)批量提取权重站点
-(7)批量提取xray结果目标\n(8)批量扫描web端口\n(9)解析排除重复IP\n(10)批量排除相同页面的子域：''')
+(7)批量提取xray结果目标\n(8)批量扫描web端口\n(9)解析排除重复IP\n(10)批量排除相同页面的子域\n(11)批量提取后台系统：''')
             if choice == "1":
                 print("------------------------------------------")
                 choice = input("(1)fofa(有次数限制)\n(2)ip138(需要代理池防拉黑)\n请输入爬取的引擎：")
@@ -98,20 +104,38 @@ if __name__ == "__main__":
             if choice == "2":
                 input_file = input("请输入文件名：")
                 remain_domain = input("是否保留域名(y/n)：")
-                output_file = "ip_addresses.txt"
+                thread_choice = input("是否多线程(y/n)：")
+                if thread_choice == "n":
+                    output_file = "ip_addresses.txt"
 
-                with open(input_file, "r") as f:
-                    domains = f.readlines()
+                    with open(input_file, "r") as f:
+                        domains = f.readlines()
 
-                with open(output_file, "w") as f:
+                    with open(output_file, "a+") as f:
+                        总进度 = len(domains)
+                        进度 = 0
+                        for domain in domains:
+                            ip = domain_to_ip(get_main(domain))
+                            if ip:
+                                if remain_domain == "y":
+                                    f.write(f"{domain.strip()} : {ip}\n")
+                                if remain_domain == "n":
+                                    f.write(f"{ip}\n")
+                            print(f"进度：{进度}/{总进度}")
+                            进度 += 1
+                if thread_choice == "y":
+
+                    with open(input_file, "r") as f:
+                        domains = f.readlines()
+
+                    总进度 = len(domains)
+                    进度 = 0
                     for domain in domains:
-                        ip = domain_to_ip(get_main(domain))
-                        if ip:
-                            if remain_domain == "y":
-                                f.write(f"{domain.strip()} : {ip}\n")
-                            if remain_domain == "n":
-                                f.write(f"{ip}\n")
-                print("域名转IP完毕")
+                        thread_domain_to_ip(get_main(domain))
+                        print(f"进度：{进度}/{总进度}")
+                        进度 += 1
+
+                    print("域名转IP完毕")
             ############################批量域名取IP#######################################
             ############################批量排重#######################################
             if choice == "3":
@@ -200,10 +224,10 @@ if __name__ == "__main__":
                     with open(file_name,"r+") as input_file:
                         urls = input_file.readlines()
 
-                    port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
-                                   8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
-                                   7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-                                   888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
+                    # port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
+                    #                8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+                    #                7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
+                    #                888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
 
                     for line in urls:
                         ip_address = get_main(line).strip()
@@ -217,10 +241,10 @@ if __name__ == "__main__":
                     with open(file_name, "r+") as input_file:
                         urls = input_file.readlines()
 
-                    port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
-                                   8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
-                                   7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-                                   888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
+                    # port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
+                    #                8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+                    #                7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
+                    #                888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
                     threads = []
                     for line in urls:
                         thread_scan_http(line,port_number)
@@ -268,9 +292,24 @@ if __name__ == "__main__":
                         sites_list.append(i)
 
                     thread_compare_sites(sites_list, "unique_sites.txt")
-
-
             ############################批量排除相同页面的子域#######################################
+            ############################批量提取后台系统#######################################
+            if choice == "11":#批量提取后台系统
+                file_name = input("请输入文件名：")
+
+                with open(file_name, "r+") as input_file:
+                    sites = input_file.readlines()
+                for url in sites:
+                    url = url.strip()
+
+                    if "http://" not in url and "https://" not in url:
+                        url = "http://" + url
+
+                    filter_back_platform(url)
+                    time.sleep(3)
+
+
+            ############################批量提取后台系统#######################################
         ###################批量操作########################
 
         if opear == "3":#更新代理池
