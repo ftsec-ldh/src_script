@@ -21,6 +21,7 @@ def check_password_input(html):
 @vthread.pool(1)
 def filter_back_platform(url):
     chrome_options = Options()
+    chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--headless')#无头模式
     chrome_options.add_argument('--disable-gpu')
     system = platform.system()
