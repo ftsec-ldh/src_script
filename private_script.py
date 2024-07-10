@@ -352,7 +352,7 @@ if __name__ == "__main__":
 
 
         if opear == "6":#目录扫描
-            url = input("要扫描的网站：")
+            file_name = input("请输入扫描的文件：")
             thread = input("线程数：")
             language = input("扫描类型(1)php (2)asp (3)jsp (4)全部：")
             proxies = input("http代理(不走代理填空即可,例如:127.0.0.1:10809)：")
@@ -367,7 +367,7 @@ if __name__ == "__main__":
             else:
                 print("请输入正确的类型")
                 continue
-            dirscan(dirsearch_path,url,thread,language,proxies)#正式开始扫描
+            dirscan(dirsearch_path,file_name,thread,language,proxies)#正式开始扫描
 
         if opear == "7":#子域收集
             choice = input("(1)oneforall单目标扫描\n(2)oneforall多目标扫描\n(3)提取单个域名\n(4)提取所有域名\n(5)查看目前收集域名：")
