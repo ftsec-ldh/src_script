@@ -45,7 +45,7 @@ def filter_back_platform(url):
         line_count = len(lines)
 
         #if (any(keyword in content for keyword in key_words) and 5 < line_count < 700) or (check_password_input(content) and line_count < 700):
-        if check_password_input(content) and line_count < 700:
+        if check_password_input(content) and line_count < 1200:
             print(f"{url}是后台登录系统  前端代码行数：{line_count}")
             with open("后台.txt","a+") as output_file:
                 output_file.write(url + "\n")
