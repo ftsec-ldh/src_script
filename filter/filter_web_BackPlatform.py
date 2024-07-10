@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.options import Options
 import time,platform,vthread
 from lxml import etree
 
-key_words = ["后台系统","登录"]
+#key_words = ["后台系统","登录"]
 
 def check_password_input(html):
     tree = etree.HTML(html)
@@ -44,7 +44,8 @@ def filter_back_platform(url):
         lines = content.splitlines()
         line_count = len(lines)
 
-        if (any(keyword in content for keyword in key_words) and 5 < line_count < 700) or (check_password_input(content) and line_count < 700):
+        #if (any(keyword in content for keyword in key_words) and 5 < line_count < 700) or (check_password_input(content) and line_count < 700):
+        if check_password_input(content) and line_count < 700:
             print(f"{url}是后台登录系统  前端代码行数：{line_count}")
             with open("后台.txt","a+") as output_file:
                 output_file.write(url + "\n")
