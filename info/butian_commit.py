@@ -7,7 +7,7 @@ from info.api import get_company,aiqicha_get
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
-import time,os,pyperclip
+import time,os,pyperclip,ast
 
 
 description = {"信息泄露":"信息泄露可能会导致黑客进一步利用敏感信息盗取更关键的内容，甚至导致系统产生RCE漏洞",
@@ -61,7 +61,7 @@ def butian_src_page(domain,leak_type,leak_url):
 
         driver_butian.get("https://www.butian.net")
         with open("butian_cookies.txt", "r+") as cookie_input:
-            cookies = eval(cookie_input.read())
+            cookies = ast.literal_eval(cookie_input.read())
         for cookie in cookies:
             driver_butian.add_cookie(cookie)
         driver_butian.get("https://www.butian.net/Loo/submit")
