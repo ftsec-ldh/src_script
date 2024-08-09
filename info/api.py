@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
-import os,base64
+import os,base64,ast
 from lxml import etree
 
 
@@ -227,7 +227,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         with open("aiqicha_cookies.txt", "r+") as cookie_input:
             try:
-                cookies = eval(cookie_input.read())
+                cookies = ast.literal_eval(cookie_input.read())
             except SyntaxError:
                 print("aiqicha_cookie格式有误，请删除该文件重新获取cookie")
         for cookie in cookies:
