@@ -35,9 +35,13 @@ https://www.chromedownloads.net/chrome64linux-stable/
 ![image](https://github.com/1607131160/src_script/assets/128038117/bf009fad-284f-46de-8888-a46956bd43d3)  
 ![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)  
 ![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
-# 更新内容 
+# 更新内容
+版本：v0.1.8  
+一、将不安全的eval方法替换为ast.literal_eval  
+二、添加C段汇总功能  
+  
 版本：v0.1.7  
-一、添加后台网站提取(准确率98%)  
+一、添加提取登录框web界面(准确率98%)  
   
 版本：v0.1.6  
 一、xray扫描功能添加cookie扫描后台选项  
