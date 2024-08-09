@@ -10,6 +10,7 @@ from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
 from filter.check_alive import filter_urls
 from filter.filter_same_web import compare_sites,thread_compare_sites
 from filter.filter_web_BackPlatform import filter_back_platform
+from filter.filter_c import filter
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
 from scan.xray_scan_urls import scan_urls,scan_urls_cookies
@@ -36,13 +37,13 @@ if not crawlergo_path.endswith("/"):
     crawlergo_path = crawlergo_path + "\\"
 
 port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,91,92,93,94,95,96,97,98,99,100, 443, 4430, 8443, 9043, 8080, 8081, 8082,
-               8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
+               8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090,8091,8092,8093,8094,8095,8096,8097,8098,8099, 8161, 8001, 8002, 8003, 7001,
                7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-               8888, 8443,9443, 4443, 4433, 3443, 9000, 9200, 10443]  # HTTP端口
+               8888, 8443,9443, 4443, 4433, 3443, 9000,9100, 9200, 10443]  # HTTP端口
 
 if __name__ == "__main__":
     while True:
-        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n(9)xray一键扫描\n请选择操作数：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n(9)xray一键扫描\n(10)C段汇总\n请选择操作数：")
         #################爬谷歌内容###########################
         if opear == "1":
             print("------------------------------------------")
@@ -224,27 +225,19 @@ if __name__ == "__main__":
                     with open(file_name,"r+") as input_file:
                         urls = input_file.readlines()
 
-                    # port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
-                    #                8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
-                    #                7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-                    #                888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
-
                     for line in urls:
                         ip_address = get_main(line).strip()
                         open_ports = scan_ports_socket(ip_address, port_number)
                         for i in scan_web_ports(ip_address, open_ports):
                             with open("open_web_ports.txt", "a+") as output_file:
-                                output_file.write(f"{ip_address}:{i}\n")
+                                if i != "80":
+                                    output_file.write(f"{ip_address}:{i}\n")
 
                 if choice_thread == "y":
                     file_name = input("请输入文件名：")
                     with open(file_name, "r+") as input_file:
                         urls = input_file.readlines()
 
-                    # port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 443, 4430, 8443, 9043, 8080, 8081, 8082,
-                    #                8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090, 8161, 8001, 8002, 8003, 7001,
-                    #                7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-                    #                888, 9443, 4443, 4433, 3443, 9000, 9200, 10443]#HTTP端口
                     threads = []
                     for line in urls:
                         thread_scan_http(line,port_number)
@@ -421,3 +414,6 @@ if __name__ == "__main__":
                             data1 = "http://" + data1
                         scan_urls_cookies(data1,xray_path,crawlergo_path,cmd)
                         cmd = cmd + 1
+        if opear == "10":#C段提取
+            file_name = input("请输入文件名：")
+            filter(file_name)
