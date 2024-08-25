@@ -1,10 +1,9 @@
-import requests
 from bs4 import BeautifulSoup
-import threading
-import time
+import requests,threading,time,ast
 
-with open("conf/proxies.conf") as input:
-    proxy_server = input.read().strip()#proxypool服务器
+with open("conf/config.conf","r",encoding="utf-8") as input:
+    proxy_server = input.read()
+    proxy_server = ast.literal_eval(proxy_server)['proxies']#proxypool服务器
 
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.72 Safari/537.36'}
 
@@ -18,8 +17,6 @@ def check(https_proxy):
             return False
     except Exception:
         return False
-
-
 
 def thread_check_Bypool(dict,proxies):#proxypool多线程读取(字典读法)
     https_proxy = dict['proxy']
@@ -72,7 +69,8 @@ def update_proxy_ByFile(file_name):#检测并更新文件代理
         thread = threading.Thread(target=thread_check_ByFile,args=[proxy,proxies])
         threads.append(thread)
         thread.start()
-        time.sleep(0.8)
+        time.sleep(0.5)
 
     for thread in threads:
         thread.join()
+    print(f"更新代理池完毕，存活{len(proxies)}个，已自动删除无效代理")
