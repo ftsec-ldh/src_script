@@ -1,27 +1,10 @@
 #从IP或域名列表中快速提取关键部分
 import platform,time,socket,urllib3,requests,re,random
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
 import os,base64,ast
 from lxml import etree
-
-
-with open("conf/proxies.conf") as proxy_input:
-    proxy_server = proxy_input.read().strip()  # proxypool服务器
-
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-system = platform.system()
-
-if system == "Windows":
-    driver_path = r'drivers\win64\chromedriver.exe'
-if system == "Linux":
-    driver_path = r'drivers/linux64/chromedriver'
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.72 Safari/537.36'}
@@ -30,15 +13,30 @@ api_url = "https://www.aizhan.com/cha/"  # 查权重的接口
 api_url2 = "http://site.ip138.com/"  # 反查域名的接口
 api_url3 = "https://aiqicha.baidu.com/s?q="  # 查公司注册资金的接口
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("no-sandbox")
-chrome_options.add_argument("--disable-extensions")
+def create_driver(无头模式=1):
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
 
-s = Service(driver_path)
-driver = webdriver.Chrome(service=s, options=chrome_options)
+    system = platform.system()
+    if system == "Windows":
+        driver_path = r'drivers\win64\chromedriver.exe'
+    if system == "Linux":
+        driver_path = r'drivers/linux64/chromedriver'
+
+    chrome_options = webdriver.ChromeOptions()
+
+    if 无头模式 == 1:
+        chrome_options.add_argument("--headless")
+
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("no-sandbox")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument(f"user-agent={headers['User-Agent']}")
+
+    s = Service(driver_path)
+    driver = webdriver.Chrome(service=s, options=chrome_options)
+    return driver
 
 #将提取到的域名取主域名
 def extract_main_domain(line):
@@ -87,6 +85,7 @@ def get_ip_address(domain):#ping功能，反查域名再正向解析判断域名
 def get_company(url,picture=0):#picture等于1则截图
     url = get_main(url)
     url = api_url + url
+    driver = create_driver()
 
     driver.get(url)
     text = driver.page_source
@@ -101,6 +100,7 @@ def get_company(url,picture=0):#picture等于1则截图
 def get_rank(url):
     url = get_main(url)
     url = api_url + url
+    driver = create_driver()
 
     driver.get(url)
     text = driver.page_source
@@ -219,9 +219,11 @@ def extract_district(text):#提取区
 
 def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-    chrome_options_area = webdriver.ChromeOptions()
-    chrome_options_area.add_argument(f"user-agent={user_agent}")
-    aiqicha_driver = webdriver.Chrome(service=s, options=chrome_options_area)
+    aiqicha_driver = create_driver(0)
+
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
 
     if os.path.exists("aiqicha_cookies.txt"):
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
