@@ -1,4 +1,4 @@
-import re,platform,time,requests,os,glob,threading
+import re,platform,time,requests,os,glob,threading,ast
 from info.api import crawl_company,get_main,extract_main_domain,get_rank
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
@@ -13,33 +13,21 @@ from filter.filter_web_BackPlatform import filter_back_platform
 from filter.filter_c import filter
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
-from scan.xray_scan_urls import scan_urls,scan_urls_cookies
+from scan.xray_scan_urls import scan_urls,scan_urls_cookies,start_xray_listen
 from scan.port_scan import scan_ports_socket,scan_web_ports,thread_scan_http
 
-with open("conf/dirsearch.conf", encoding="utf-8") as input_file:
-    dirsearch_path = input_file.read()
-if not dirsearch_path.endswith("/"):
-    dirsearch_path = dirsearch_path + "\\"
-
-with open("conf/oneforall.conf", encoding="utf-8") as input_file:
-    oneforall_path = input_file.read()
-if not oneforall_path.endswith("/"):
-    oneforall_path = oneforall_path + "\\"
-
-with open("conf/xray.conf", encoding="utf-8") as input_file:
-    xray_path = input_file.read()
-if not xray_path.endswith("/"):
-    xray_path = xray_path + "\\"
-
-with open("conf/crawlergo.conf", encoding="utf-8") as input_file:
-    crawlergo_path = input_file.read()
-if not crawlergo_path.endswith("/"):
-    crawlergo_path = crawlergo_path + "\\"
+with open("conf/config.conf", encoding="utf-8") as config_file:
+    config = config_file.read()
+    config = ast.literal_eval(config)
+    dirsearch_path = config['dirsearch_path']
+    oneforall_path = config['oneforall_path']
+    xray_path = config['xray_path']
+    crawlergo_path = config['crawlergo_path']
 
 port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,91,92,93,94,95,96,97,98,99,100, 443, 4430, 8443, 9043, 8080, 8081, 8082,
                8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090,8091,8092,8093,8094,8095,8096,8097,8098,8099, 8161, 8001, 8002, 8003, 7001,
                7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010, 5443, 9999, 8888, 8181, 8180,
-               8888, 8443,9443, 4443, 4433, 3443, 9000,9100, 9200, 10443]  # HTTP端口
+               8888, 8443,9443, 4443, 4433, 3443, 9000,9100, 9200, 10443]
 
 if __name__ == "__main__":
     while True:
@@ -393,27 +381,33 @@ if __name__ == "__main__":
             butian_src_page(domain, leak_type, leak_url)
 
         if opear == "9":#xray一键扫描
-            file_name = input("请输入文件名：")
-            cookie_choice = input("是否导入cookie(y/n)：")
-            if cookie_choice == "n":
-                with open(file_name, "r+") as input_file:
-                    cmd = 0
-                    for text in input_file.readlines():
-                        data1 = text.strip('\n')
-                        if "http://" not in data1 and "https://" not in data1:
-                            data1 = "http://" + data1
-                        scan_urls(data1,xray_path,crawlergo_path,cmd)
-                        cmd = cmd + 1
-            if cookie_choice == "y":
-                print("cookie请到xray_scan_urls.py中与config.yaml中自定义")
-                with open(file_name, "r+") as input_file:
-                    cmd = 0
-                    for text in input_file.readlines():
-                        data1 = text.strip('\n')
-                        if "http://" not in data1 and "https://" not in data1:
-                            data1 = "http://" + data1
-                        scan_urls_cookies(data1,xray_path,crawlergo_path,cmd)
-                        cmd = cmd + 1
+            choice = input("是否crawlergo自动进行爬取(y/n)(选择否则只监听)：")
+            if choice == 'y':
+                file_name = input("请输入文件名：")
+                cookie_choice = input("是否导入cookie(y/n)：")
+                if cookie_choice == "n":
+                    with open(file_name, "r+") as input_file:
+                        cmd = 0
+                        for text in input_file.readlines():
+                            data1 = text.strip('\n')
+                            if "http://" not in data1 and "https://" not in data1:
+                                data1 = "http://" + data1
+                            scan_urls(data1,xray_path,crawlergo_path,cmd)
+                            cmd = cmd + 1
+                if cookie_choice == "y":
+                    print("cookie请到xray_scan_urls.py中与config.yaml中自定义")
+                    with open(file_name, "r+") as input_file:
+                        cmd = 0
+                        for text in input_file.readlines():
+                            data1 = text.strip('\n')
+                            if "http://" not in data1 and "https://" not in data1:
+                                data1 = "http://" + data1
+                            scan_urls_cookies(data1,xray_path,crawlergo_path,cmd)
+                            cmd = cmd + 1
+            if choice == "n":
+                start_xray_listen(xray_path)
+                print("正在监听端口62224")
+
         if opear == "10":#C段提取
             file_name = input("请输入文件名：")
             filter(file_name)
