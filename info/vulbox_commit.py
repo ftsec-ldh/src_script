@@ -1,12 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from info.api import get_company,aiqicha_get
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.keys import Keys
 import time,os,pyperclip,ast
 
 
@@ -26,6 +17,16 @@ suggestions = {
 }
 
 def vulbox_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
+    from selenium import webdriver
+    from selenium.webdriver.chrome.webdriver import Service
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from info.api import get_company, aiqicha_get
+    from selenium.webdriver.common.action_chains import ActionChains
+    from selenium.webdriver.support.ui import Select
+    from selenium.webdriver.common.keys import Keys
+
     s = Service("drivers/win64/chromedriver.exe")
     driver_vulbox = webdriver.Chrome(service=s)
     driver_vulbox.get("https://www.vulbox.com/account/login")
@@ -46,6 +47,16 @@ def vulbox_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
     print("请重新执行该软件")
 
 def vulbox_src_page(domain,leak_type,leak_url):
+    from selenium import webdriver
+    from selenium.webdriver.chrome.webdriver import Service
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from info.api import get_company, aiqicha_get
+    from selenium.webdriver.common.action_chains import ActionChains
+    from selenium.webdriver.support.ui import Select
+    from selenium.webdriver.common.keys import Keys
+
     if os.path.exists("vulbox_cookies.txt"):
         company_name = get_company(domain,1)#获取公司名
         area_dict = aiqicha_get(company_name,1)#获取公司地址、注册资金、行业划分,1代表要拍照
