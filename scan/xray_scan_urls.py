@@ -31,9 +31,20 @@ def opt2File2(subdomains):
 	finally:
 		f.close()
 
+def start_xray_listen(xray_path):
+	if "xray.html" in os.listdir(xray_path):
+		choice = input("发现存在xray.html，是否删除？(y/n)：")
+		if choice == "y":
+			os.remove(xray_path + "/xray.html")
+		if choice == "n":
+			exit()
+	os.chdir(xray_path)
+	command = f'xray_windows_amd64.exe webscan --listen 127.0.0.1:62224 --html-output xray.html'
+	os.system(f'start cmd.exe /K {command}')
+
 def scan_urls(data1,xray_path,crawlergo_path,cmd):
 	if cmd == 0:
-		os.chdir(xray_path)
+		start_xray_listen(xray_path)
 
 		yaml = YAML()
 		yaml.preserve_quotes = True
@@ -47,9 +58,6 @@ def scan_urls(data1,xray_path,crawlergo_path,cmd):
 
 		with open(f"{xray_path}config.yaml", 'w', encoding='utf-8') as file:
 			yaml.dump(config_data, file)
-
-		command = f'xray_windows_amd64.exe webscan --listen 127.0.0.1:62224 --html-output xray.html'
-		os.system(f'start cmd.exe /K {command}')
 
 	target = data1
 	cmd = [f"{crawlergo_path}crawlergo_win_amd64.exe","-t", "5","-f","smart","--fuzz-path","--custom-headers",json.dumps(get_random_headers()), "--request-proxy", "http://127.0.0.1:62224", "--push-pool-max", "10","--output-mode", "json" , target]
@@ -72,11 +80,11 @@ def scan_urls(data1,xray_path,crawlergo_path,cmd):
 
 def scan_urls_cookies(data1,xray_path,crawlergo_path,cmd):
 
-	Cookie = "ASP.NET_SessionId=gwwpksnpoanpc1sd1tgv1s44"
+	Cookie = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaW4tdXNlciIsImlhdCI6MTcyMjYwODMxMiwiZXhwIjoxNzIyNjk0NzEyLCJpZCI6IjE4MiJ9.Qg_XGW9LWi2ebf8ZSctiR-BPMn-iUKNpNEaPEcnCw_A"
 
 	headers = {
 		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0",
-		"Cookie": Cookie
+		"Token": Cookie
 	}
 
 
