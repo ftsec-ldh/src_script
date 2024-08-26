@@ -12,7 +12,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 proxies = {"http": "socks5://127.0.0.1:10808",
            "https": "socks5://127.0.0.1:10808"}
 
-def google_search(page_start,page_end,content):
+def google_search():
+    print("------------------------------------------")
+    page_start = input("请输入爬取的起始页(例如0)：")
+    page_end = input("请输入爬取的结尾页(例如100)：")
+    content = input("请输入爬取的内容(例如谷歌语法)：")
     start = int(page_start) #起始页面
     end = int(page_end)
     search = content #搜索内容
