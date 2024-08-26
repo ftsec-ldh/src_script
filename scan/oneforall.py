@@ -20,7 +20,7 @@ def domain_scan(domain_search):#oneforall联动subfinder
     urls = set()
 
     command = ['python', f'{oneforall_path}\oneforall.py', '--valid=None', '--verify=False', f'--target={domain_search}', 'run']
-    print(f"即将调用OneForAll收集域名：{domain_search}，请耐心等待！")
+    print(f"正在调用OneForAll收集域名：{domain_search}，请耐心等待！")
     subprocess.run(command, capture_output=True, text=True)
     try:
         df = pd.read_csv(f"{oneforall_path}\\results\\{domain_search}.csv", encoding='utf-8')
@@ -32,7 +32,7 @@ def domain_scan(domain_search):#oneforall联动subfinder
         urls.add(url)
 
     command = [f'{subfinder_path}\\subfinder.exe', '-d', domain_search]
-    print(f"即将调用SubFinder收集域名：{domain_search}，请耐心等待！")
+    print(f"正在调用SubFinder收集域名：{domain_search}，请耐心等待！")
     result = subprocess.run(command, capture_output=True, text=True)
     for url in result.stdout.split("\n"):
         urls.add(url)
