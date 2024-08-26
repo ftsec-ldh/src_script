@@ -20,7 +20,6 @@ with open("conf/config.conf", encoding="utf-8") as config_file:
     config = config_file.read()
     config = ast.literal_eval(config)
     dirsearch_path = config['dirsearch_path']
-    oneforall_path = config['oneforall_path']
     xray_path = config['xray_path']
     crawlergo_path = config['crawlergo_path']
 
@@ -32,15 +31,11 @@ port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,91,92,93,94,95,96,97,9
 if __name__ == "__main__":
     while True:
         opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n(9)xray一键扫描\n(10)C段汇总\n请选择操作数：")
-        #################爬谷歌内容###########################
-        if opear == "1":
-            print("------------------------------------------")
-            page_start = input("请输入爬取的起始页(例如0)：")
-            page_end = input("请输入爬取的结尾页(例如100)：")
-            crawl_content = input("请输入爬取的内容(例如谷歌语法)：")
-            google_search(page_start,page_end,crawl_content)
-       ###################爬谷歌内容########################
-       ###################批量操作########################
+        
+        if opear == "1":#爬谷歌url
+            google_search()
+
+
         if opear == "2":
             print("------------------------------------------")
             choice = input('''(1)批量取权重、公司名\n(2)批量域名取IP地址\n(3)批量排重\n(4)批量检测存活\n(5)根域名复查权重(只支持方法1导出的文件格式)\n(6)批量提取权重站点
@@ -48,8 +43,7 @@ if __name__ == "__main__":
             if choice == "1":
                 print("------------------------------------------")
                 choice = input("(1)fofa(有次数限制)\n(2)ip138(需要代理池防拉黑)\n请输入爬取的引擎：")
-                if choice == '1':
-                 ############################直接爬fofa##################################
+                if choice == '1':#fofa取IP
                     file_name = input("请输入文件名：")
                     try:
                         with open(file_name, "r+") as file_name_input:
@@ -61,9 +55,8 @@ if __name__ == "__main__":
                         line = line.strip()
                         crawl_company(line,1)#这里没有传递proxies，故不启用代理池
 
-                ############################直接爬fofa########################################
-                ############################代理池爬ip138取IP##################################
-                if choice == '2':
+
+                if choice == '2':#代理池爬ip138取IP
                     try:
                         with open("proxies.txt", "r+") as proxies_input:
                             proxies = proxies_input.readlines()#读代理文件
@@ -88,9 +81,7 @@ if __name__ == "__main__":
                             else:
                                 break
                     exit()
-                ############################代理池爬ip138取IP##################################
-            ############################批量域名取IP#######################################
-            if choice == "2":
+            if choice == "2":#批量域名取IP
                 input_file = input("请输入文件名：")
                 remain_domain = input("是否保留域名(y/n)：")
                 thread_choice = input("是否多线程(y/n)：")
@@ -126,17 +117,20 @@ if __name__ == "__main__":
 
                     print("域名转IP完毕")
             ############################批量域名取IP#######################################
-            ############################批量排重#######################################
-            if choice == "3":
+
+            if choice == "3":#批量排重
                 input_file = input("请输入需要排重的文件：")
                 remove_duplicates(input_file)
-            ############################批量排重#######################################
+
+
             ############################批量检测存活#######################################
             if choice == '4':
                 file_name = input("请输入文件名：")
                 filter_urls(file_name)
                 time.sleep(1)
             ############################批量检测存活#######################################
+
+
             ############################根域名复查权重#######################################
             if choice == "5":#根域名复查权重，防止主域名比二级域名权重高
                 file_name = input("请输入文件名：")
@@ -351,26 +345,18 @@ if __name__ == "__main__":
             dirscan(dirsearch_path,file_name,thread,language,proxies)#正式开始扫描
 
         if opear == "7":#子域收集
-            choice = input("(1)oneforall单目标扫描\n(2)oneforall多目标扫描\n(3)提取单个域名\n(4)提取所有域名\n(5)查看目前收集域名：")
-            if choice == "1":
+            choice = input("(1)单域名收集\n(2)多域名收集：")
+            if choice == "1":#单目标扫描
                 url = input("请输入要收集的域名：")
-                domain_scan(oneforall_path, url)
-            if choice == "2":
+                urls = domain_scan(url)
+                with open(f"{url}.txt","a+") as output_file:
+                    for url in urls:
+                        output_file.write(url + "\n")
+
+            if choice == "2":#多目标扫描
                 file_name = input("请输入文件名：")
-                domains_scan(oneforall_path,file_name)
-            if choice == "3":
-                domain_name = input("请输入单个域名：")
-                filter_validIP(oneforall_path,domain_name)
-            if choice == "4":
-                filter_validIPs(oneforall_path)
-            if choice == "5":
-                print("-----------目前域名------------")
-                csv_files = glob.glob(f'{oneforall_path}results\*.csv')
-                for csv in csv_files:
-                    name = re.search(r'\\([^\\]+)\.csv$',csv).group(1)
-                    if "all_subdomain" not in name:
-                        print(name)
-                print("-----------目前域名------------")
+                domains_scan(file_name)
+
         if opear == "8":#补天自动化提交
             domain = input("请输入存在漏洞的域名：")
             type = {"1": "逻辑漏洞", "2": "SQL注入", "3": "XSS", "4": "信息泄露", "5": "弱口令","6":"代码执行"}
