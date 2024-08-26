@@ -1,7 +1,7 @@
 import os,ast
 import pandas as pd
 import glob,subprocess
-from urllib.parse import urlparse
+import numpy as np
 
 # 保存排重后的域名到文件
 def save_domains_to_file(domains, filename):
@@ -36,7 +36,11 @@ def domain_scan(domain_search):#oneforall联动subfinder
     result = subprocess.run(command, capture_output=True, text=True)
     for url in result.stdout.split("\n"):
         urls.add(url)
+
+    while np.nan in urls:
+        urls.remove(np.nan)#删除nan类型的float元素，防止报错
     urls.remove('')
+
     return urls
 
 def domains_scan(file_name):
