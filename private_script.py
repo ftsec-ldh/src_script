@@ -350,8 +350,8 @@ if __name__ == "__main__":
                 url = input("请输入要收集的域名：")
                 urls = domain_scan(url)
                 with open(f"{url}.txt","a+") as output_file:
-                    for url in urls:
-                        output_file.write(url + "\n")
+                    for result in urls:
+                        output_file.write(result + "\n")
 
             if choice == "2":#多目标扫描
                 file_name = input("请输入文件名：")
