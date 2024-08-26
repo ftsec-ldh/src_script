@@ -13,7 +13,7 @@ linux-chrome版本为91.0.4472
   
 https://googlechromelabs.github.io/chrome-for-testing/  
 
-# CentOS7安装chrome拓展：
+# CentOS安装chrome拓展：
 下载91.0.4472的版本
 https://www.chromedownloads.net/chrome64linux-stable/  
 `yum install ./google-chrome-stable_current_x86_64.rpm`  
