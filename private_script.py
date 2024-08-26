@@ -12,7 +12,7 @@ from filter.filter_same_web import compare_sites,thread_compare_sites
 from filter.filter_web_BackPlatform import filter_back_platform
 from filter.filter_c import filter
 from scan.dirsearch import dirscan
-from scan.oneforall import domain_scan,domains_scan,filter_validIP,filter_validIPs
+from scan.oneforall import domain_scan
 from scan.xray_scan_urls import scan_urls,scan_urls_cookies,start_xray_listen
 from scan.port_scan import scan_ports_socket,scan_web_ports,thread_scan_http
 
@@ -355,7 +355,7 @@ if __name__ == "__main__":
 
             if choice == "2":#多目标扫描
                 file_name = input("请输入文件名：")
-                domains_scan(file_name)
+                pass
 
         if opear == "8":#补天自动化提交
             domain = input("请输入存在漏洞的域名：")
