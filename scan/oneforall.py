@@ -1,6 +1,7 @@
 import os
 import ast
 import pandas as pd
+from pandas.errors import EmptyDataError
 import glob
 import subprocess,time
 import numpy as np
@@ -28,6 +29,8 @@ def domain_scan(domain_search):# oneforall联动subfinder
         df = pd.read_csv(f"{oneforall_path}/results/{domain_search}.csv", encoding='utf-8')
     except UnicodeDecodeError:
         df = pd.read_csv(f"{oneforall_path}/results/{domain_search}.csv", encoding='latin1')
+    except EmptyDataError:
+        print(f"OneForAll查询域名：{domain_search}的结果为空")
 
     valid_urls = df['subdomain'].tolist()
     for url in valid_urls:
@@ -100,7 +103,7 @@ def domain_scan(domain_search):# oneforall联动subfinder
 
                 button = shadow_root3.find_element(By.CSS_SELECTOR, "div.spinner")
                 driver_search_domain.execute_script("arguments[0].click();", button)
-                time.sleep(1)
+                time.sleep(0.5)
                 if element.get_attribute('hidden'):#按钮消失说明域名取完了
                     print("域名好像不需要获取了，可以了")
                     break
