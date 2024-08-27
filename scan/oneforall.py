@@ -55,23 +55,39 @@ def domain_scan(domain_search):# oneforall联动subfinder
     driver_search_domain.get(f"https://www.virustotal.com/gui/domain/{domain_search}/relations")
     time.sleep(3)
     try:
-        for i in range(999):
-            element = WebDriverWait(driver_search_domain, 600).until(EC.presence_of_element_located((By.XPATH, "//domain-view[@name='domain-view']")))
-            shadow_root1 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
+        element = WebDriverWait(driver_search_domain, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//domain-view[@name='domain-view']")))
+        shadow_root1 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
 
-            element = shadow_root1.find_element(By.CSS_SELECTOR, "vt-ui-domain-relations#relations")
-            shadow_root2 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
+        element = shadow_root1.find_element(By.CSS_SELECTOR, "vt-ui-domain-relations#relations")
+        shadow_root2 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
 
-            element = shadow_root2.find_element(By.CSS_SELECTOR, "vt-ui-expandable[class=' mb-3 subdomains ']")
+        element = shadow_root2.find_element(By.CSS_SELECTOR, "vt-ui-expandable[class=' mb-3 subdomains ']")
 
-            element = element.find_element(By.CSS_SELECTOR,"vt-ui-button[class='load-more mt-3']")
-            shadow_root3 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
+        element = element.find_element(By.CSS_SELECTOR, "vt-ui-button[class='load-more mt-3']")
+        shadow_root3 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
 
-            button = shadow_root3.find_element(By.CSS_SELECTOR, "div.spinner")
-            driver_search_domain.execute_script("arguments[0].click();", button)
-            time.sleep(1)
-            if element.get_attribute('hidden'):#按钮消失说明域名取完了
-                break
+        button = shadow_root3.find_element(By.CSS_SELECTOR, "div.spinner")
+        driver_search_domain.execute_script("arguments[0].click();", button)
+        time.sleep(1)
+        if element.get_attribute('hidden') == False:
+            for i in range(999):#循环获取域名
+                element = WebDriverWait(driver_search_domain, 600).until(EC.presence_of_element_located((By.XPATH, "//domain-view[@name='domain-view']")))
+                shadow_root1 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
+
+                element = shadow_root1.find_element(By.CSS_SELECTOR, "vt-ui-domain-relations#relations")
+                shadow_root2 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
+
+                element = shadow_root2.find_element(By.CSS_SELECTOR, "vt-ui-expandable[class=' mb-3 subdomains ']")
+
+                element = element.find_element(By.CSS_SELECTOR,"vt-ui-button[class='load-more mt-3']")
+                shadow_root3 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
+
+                button = shadow_root3.find_element(By.CSS_SELECTOR, "div.spinner")
+                driver_search_domain.execute_script("arguments[0].click();", button)
+                time.sleep(1)
+                if element.get_attribute('hidden'):#按钮消失说明域名取完了
+                    break
 
         element = WebDriverWait(driver_search_domain, 600).until(EC.presence_of_element_located((By.XPATH, "//domain-view[@name='domain-view']")))
         shadow_root1 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
