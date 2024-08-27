@@ -32,9 +32,12 @@ def domain_scan(domain_search):# oneforall联动subfinder
     except EmptyDataError:
         print(f"OneForAll查询域名：{domain_search}的结果为空")
 
-    valid_urls = df['subdomain'].tolist()
-    for url in valid_urls:
-        urls.add(url)
+    try:
+        valid_urls = df['subdomain'].tolist()
+        for url in valid_urls:
+            urls.add(url)
+    except Exception:
+        pass
 
     command = [f'{subfinder_path}/subfinder.exe', '-d', domain_search]
     print(f"正在调用SubFinder收集域名：{domain_search}，请耐心等待！")
