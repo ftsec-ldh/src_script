@@ -17,46 +17,51 @@ def domain_scan(domain_search):# oneforall联动subfinder
 
     urls = set()
 
-    command = ['python', f'{oneforall_path}/oneforall.py', '--valid=None', '--verify=False',f'--target={domain_search}', 'run']
-    print(f"正在调用OneForAll收集域名：{domain_search}，请耐心等待！")
-    try:
-        subprocess.run(command, capture_output=True, text=True,encoding='utf-8')
-    except Exception as e:
-        print(f"输出：{e}")
+    # command = ['python', f'{oneforall_path}/oneforall.py', '--valid=None', '--verify=False',f'--target={domain_search}', 'run']
+    # print(f"正在调用OneForAll收集域名：{domain_search}，请耐心等待！")
+    # try:
+    #     subprocess.run(command, capture_output=True, text=True,encoding='utf-8')
+    # except Exception as e:
+    #     print(f"输出：{e}")
+    #
+    # try:
+    #     df = pd.read_csv(f"{oneforall_path}/results/{domain_search}.csv", encoding='utf-8')
+    # except UnicodeDecodeError:
+    #     df = pd.read_csv(f"{oneforall_path}/results/{domain_search}.csv", encoding='latin1')
+    #
+    # valid_urls = df['subdomain'].tolist()
+    # for url in valid_urls:
+    #     urls.add(url)
+    #
+    # command = [f'{subfinder_path}/subfinder.exe', '-d', domain_search]
+    # print(f"正在调用SubFinder收集域名：{domain_search}，请耐心等待！")
+    # result = subprocess.run(command, capture_output=True, text=True,encoding='utf-8')
+    #
+    # if result.stdout:#检查输出是否存在
+    #     for url in result.stdout.split("\n"):
+    #         if url:#确保url不为空
+    #             urls.add(url)
 
-    try:
-        df = pd.read_csv(f"{oneforall_path}/results/{domain_search}.csv", encoding='utf-8')
-    except UnicodeDecodeError:
-        df = pd.read_csv(f"{oneforall_path}/results/{domain_search}.csv", encoding='latin1')
-
-    valid_urls = df['subdomain'].tolist()
-    for url in valid_urls:
-        urls.add(url)
-
-    command = [f'{subfinder_path}/subfinder.exe', '-d', domain_search]
-    print(f"正在调用SubFinder收集域名：{domain_search}，请耐心等待！")
-    result = subprocess.run(command, capture_output=True, text=True,encoding='utf-8')
-
-    if result.stdout:#检查输出是否存在
-        for url in result.stdout.split("\n"):
-            if url:#确保url不为空
-                urls.add(url)
-
-    # 删除nan类型的float元素
-    urls.discard(np.nan)
-    urls.discard('')
+    # # 删除nan类型的float元素
+    # urls.discard(np.nan)
+    # urls.discard('')
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.wait import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     s = Service("drivers/win64/chromedriver.exe")
-    driver_search_domain = webdriver.Chrome(service=s)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--headless")  # 启用无头模式
+    chrome_options.add_argument("--disable-gpu")  # Windows上的禁用GPU加速，有时对于无头模式是必要的
+    driver_search_domain = webdriver.Chrome(service=s,options=chrome_options)
     driver_search_domain.get(f"https://www.virustotal.com/gui/domain/{domain_search}/relations")
-    time.sleep(3)
 
-    element = WebDriverWait(driver_search_domain, 600).until(
-        EC.presence_of_element_located((By.XPATH, "//domain-view[@name='domain-view']")))
+    # captcha_element = WebDriverWait(driver_search_domain, 600).until(EC.presence_of_element_located((By.XPATH, "//iframe[@title='reCAPTCHA']")))
+    # driver_search_domain.switch_to.frame(captcha_element)
+
+
+    element = WebDriverWait(driver_search_domain, 600).until(EC.presence_of_element_located((By.XPATH, "//domain-view[@name='domain-view']")))
     shadow_root1 = driver_search_domain.execute_script('return arguments[0].shadowRoot', element)
 
     element = shadow_root1.find_element(By.CSS_SELECTOR, "vt-ui-domain-relations#relations")
