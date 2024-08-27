@@ -88,6 +88,7 @@ def domain_scan(domain_search):# oneforall联动subfinder
             time.sleep(1)
             if element.get_attribute('hidden'):#按钮消失说明域名取完了
                 print("域名好像不需要获取了，可以了")
+                break
     else:
         print("域名好像不需要获取了，可以了")
 
