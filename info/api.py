@@ -343,7 +343,9 @@ def aiqicha_captcha():
     from selenium.webdriver.support import expected_conditions as EC
 
     aiqicha_driver = create_driver(0)
-
+    aiqicha_driver.get(f"https://aiqicha.baidu.com/company_detail_28783255028393")
+    time.sleep(3)
+    aiqicha_driver.delete_all_cookies()
     aiqicha_driver.get(f"https://aiqicha.baidu.com/company_detail_28783255028393")
 
     WebDriverWait(aiqicha_driver, 600).until(
