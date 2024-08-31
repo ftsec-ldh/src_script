@@ -1,7 +1,6 @@
 import os,time
 from info.api import get_company,aiqicha_get
 from filter.socket_getIP import domain_to_ip
-from selenium.webdriver.support.ui import Select
 from docx import Document
 from docx.shared import Inches,Pt
 from docx.oxml.ns import qn
@@ -71,6 +70,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
         from selenium.webdriver.support.wait import WebDriverWait
         from selenium.webdriver.support import expected_conditions as EC
         from selenium.webdriver.common.action_chains import ActionChains
+        from selenium.webdriver.support.ui import Select
         s = Service('drivers/win64/chromedriver.exe')
         options = webdriver.ChromeOptions()
         # 禁用GPU
