@@ -2,8 +2,9 @@ import re,platform,time,requests,os,glob,threading,ast
 from info.api import crawl_company,get_main,extract_main_domain,get_rank
 from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
-from info.vulbox_commit import vulbox_login,vulbox_src_page
-from info.butian_commit import butian_login,butian_src_page
+from info.vulbox_commit import vulbox_src_page
+from info.butian_commit import butian_src_page
+from info.cnvd_commit import cnvd_src_page
 from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip,thread_domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
@@ -30,7 +31,7 @@ port_number = [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,91,92,93,94,95,96,97,9
 
 if __name__ == "__main__":
     while True:
-        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)子域收集\n(8)补天半自动化提交\n(9)xray一键扫描\n(10)C段汇总\n请选择操作数：")
+        opear = input("(1)爬取谷歌内容\n(2)批量操作\n(3)更新代理池\n(4)盒子半自动化提交\n(5)取网站ico哈希值\n(6)目录扫描\n(7)信息收集\n(8)补天半自动化提交\n(9)xray一键扫描\n(10)C段汇总\n(11)cnvd半自动化提交\n请选择操作数：")
         
         if opear == "1":#爬谷歌url
             google_search()
@@ -397,3 +398,11 @@ if __name__ == "__main__":
         if opear == "10":#C段提取
             file_name = input("请输入文件名：")
             filter(file_name)
+        if opear == "11":#cnvd半自动化提交
+            domain = input("请输入存在漏洞的域名：")
+            type = {"1": "逻辑缺陷", "2": "SQL注入", "3": "XSS", "4": "信息泄露", "5": "弱口令", "6": "命令执行"}
+            choice = input(f"请选择漏洞类型:{type}：")
+            leak_type = type[choice]
+
+            leak_url = input("请输入漏洞url：")
+            cnvd_src_page(domain, leak_type, leak_url)
