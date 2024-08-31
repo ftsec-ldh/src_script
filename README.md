@@ -38,9 +38,9 @@ https://www.chromedownloads.net/chrome64linux-stable/
 # 更新内容
 版本：v0.1.9  
 一、增加CNVD半自动化提交功能  
-二、优化子域收集(集合oneforall+subfinder+virustotal爬取) 
-三、优化代码逻辑
-
+二、优化子域收集(集合oneforall+subfinder+virustotal爬取)  
+三、优化代码逻辑  
+  
 版本：v0.1.8  
 一、将不安全的eval方法替换为ast.literal_eval  
 二、添加C段汇总功能  
