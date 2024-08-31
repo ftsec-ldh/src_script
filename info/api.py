@@ -25,8 +25,31 @@ def create_driver(无头模式=1):
 
     chrome_options = webdriver.ChromeOptions()
 
+
     if 无头模式 == 1:
         chrome_options.add_argument("--headless")
+        # chrome_options.add_argument('blink-settings=imagesEnabled=false')
+        # prefs = {
+        #     "profile.managed_default_content_settings.images": 2,
+        #     "profile.default_content_setting_values": {
+        #         "automatic_downloads": 1,
+        #         "notifications": 1,
+        #         "popups": 1,
+        #         "geolocation": 1
+        #     }
+        # }
+        # chrome_options.add_experimental_option("prefs", prefs)
+        # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        # chrome_options.add_argument("--disable-blink-features")
+        # chrome_options.add_experimental_option('useAutomationExtension', False)
+        # chrome_options.add_argument('disable-infobars')
+        # # 禁用安全警告
+        # chrome_options.add_argument('--disable-web-security')
+        # chrome_options.add_argument("--ignore-certificate-errors")
+        # chrome_options.add_argument("--allow-running-insecure-content")
+        # # 禁止自动跳转(http自动跳转成https)
+        # chrome_options.add_argument("--disable-features=AutomaticHttpsRedirect")
 
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--disable-gpu")
@@ -219,12 +242,11 @@ def extract_district(text):#提取区
 
 def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-    aiqicha_driver = create_driver(0)
-
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
+    aiqicha_driver = create_driver(1)
     if os.path.exists("aiqicha_cookies.txt"):
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         with open("aiqicha_cookies.txt", "r+") as cookie_input:
@@ -238,8 +260,6 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
             except Exception:
                 pass
 
-
-
         aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
         try:
             WebDriverWait(aiqicha_driver, 10).until(
@@ -248,9 +268,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
             )  # 等待元素
         except Exception:
             os.remove("aiqicha_cookies.txt")
-            print("检测到需要重新过验证码，已自动删除aiqicha_cookies.txt，请再次更新cookies")
-            aiqicha_driver.quit()
-            print("cookie更新完毕，请再次重启。")
+            print("检测到需要重新过验证码，已自动删除aiqicha_cookies.txt，请重启我再次更新cookies，")
             exit()
 
         html = aiqicha_driver.page_source
@@ -263,7 +281,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         detail_page = "/company_detail_" + str(re.findall(r"\d.+",elements)[0])
         aiqicha_driver.get(f"https://aiqicha.baidu.com/{detail_page}")#使用无头模式这里会被检测到
 
-        WebDriverWait(aiqicha_driver, 10).until(
+        WebDriverWait(aiqicha_driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//td[preceding-sibling::td[@data-v-3869a30a='' and contains(text(), '行政区划')]]"))
         )#等待元素
 
@@ -316,18 +334,27 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         return {"money":money,"province":province,"city":city,"area":area,"division":division,"phone_number":phone_number}
 
     else:
-        aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         print("检测到你没有过验证，请手动过验证：")
+        aiqicha_captcha()
 
-        WebDriverWait(aiqicha_driver, 600).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
-        )#等待元素
+def aiqicha_captcha():
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
 
-        input("如需获取电话号码，请继续登录，登陆完毕输入任意字符继续：")
+    aiqicha_driver = create_driver(0)
 
-        cookies = aiqicha_driver.get_cookies()
-        with open("aiqicha_cookies.txt","w+") as output:
-            output.write(str(cookies))
-        print("写入cookie完成，请重启我")
-        aiqicha_driver.quit()
-        exit()
+    aiqicha_driver.get(f"https://aiqicha.baidu.com/company_detail_28783255028393")
+
+    WebDriverWait(aiqicha_driver, 600).until(
+        EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
+    )  # 等待元素
+
+    input("如需获取电话号码，请登录爱企查，登陆完毕输入任意字符继续：")
+
+    cookies = aiqicha_driver.get_cookies()
+    with open("aiqicha_cookies.txt", "w+") as output:
+        output.write(str(cookies))
+    aiqicha_driver.quit()
+    print("写入cookie完成，请重启我")
+    exit()
