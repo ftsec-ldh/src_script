@@ -154,7 +154,6 @@ def cnvd_src_page(domain, leak_type, leak_url):
         element.send_keys(f"{suggestions[leak_type]}")
 
         element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='flawAttFile']")))#文件上传
-        print(f"{os.getcwd()}/{company_name}存在{leak_type}.docx")
         element.send_keys(f"{os.getcwd()}\{company_name}存在{leak_type}.docx")
 
 
