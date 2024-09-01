@@ -38,6 +38,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
 
         print("正在使用爱企查查询企业信息，请耐心等待...")
         company_info = aiqicha_get(company_name, 1)
+        print(company_info)
 
         ip = domain_to_ip(domain)
         province = company_info['province']
@@ -71,7 +72,9 @@ def cnvd_src_page(domain, leak_type, leak_url):
         from selenium.webdriver.support import expected_conditions as EC
         from selenium.webdriver.common.action_chains import ActionChains
         from selenium.webdriver.support.ui import Select
+
         s = Service('drivers/win64/chromedriver.exe')
+
         options = webdriver.ChromeOptions()
         # 禁用GPU
         options.add_argument('--disable-gpu')
@@ -111,26 +114,29 @@ def cnvd_src_page(domain, leak_type, leak_url):
             exit()
         actions.send_keys_to_element(element,company_name).perform()
         
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@id='select2-param_city-container']")))#所在省份-点击去掉记录
+        element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//span[@id='select2-param_city-container']")))#所在省份-点击去掉记录
         actions.click(element).perform()
 
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@name='flowIP']")))#所属IP
+        element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//input[@name='flowIP']")))#所属IP
         element.send_keys(ip)
 
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@id='select2-param_province-container']")))#所在省份
+        element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//span[@id='select2-param_province-container']")))#所在省份
         actions.click(element).perform()
 
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//li[contains(text(), '{province}')]")))#省选项
+        element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_element_located((By.XPATH, f"//li[contains(text(), '{province}')]")))#省选项
         actions.click(element).perform()
 
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//span[@id='select2-param_city-container']")))#所在城市
+        element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_element_located((By.XPATH, f"//span[@id='select2-param_city-container']")))#所在城市
         actions.click(element).perform()
 
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//li[contains(text(),'{city}')]")))#城市选项
-        actions.click(element).perform()
+        try:
+            element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_element_located((By.XPATH, f"//li[contains(text(),'{city}')]")))#城市选项
+            actions.click(element).perform()
+        except Exception:
+            print("接口返还城市未与该列表匹配，请手动选择")
 
 
-        element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_all_elements_located((By.XPATH, f"//input[@placeholder='XXXX网站/XXXX系统/XXXX平台/XXXX']")))#漏洞网站公司名
+        element = WebDriverWait(cnvd_driver, 3).until(EC.presence_of_all_elements_located((By.XPATH, f"//input[@placeholder='XXXX网站/XXXX系统/XXXX平台/XXXX']")))#漏洞网站公司名
         element[0].send_keys(f"{company_name}网站")
 
         s1 = Select(cnvd_driver.find_element(By.NAME, "titlel"))#漏洞类型
