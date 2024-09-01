@@ -1,10 +1,10 @@
 import socket
 import vthread
-
+from info.api import get_main
 
 def domain_to_ip(domain):
     try:
-        ip = socket.gethostbyname(domain.strip())
+        ip = socket.gethostbyname(get_main(domain.strip()))
         return ip
     except socket.error as e:
         print(f"Error converting {domain} to IP: {e}")
