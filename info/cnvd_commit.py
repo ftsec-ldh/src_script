@@ -36,6 +36,10 @@ def cnvd_src_page(domain, leak_type, leak_url):
         print("正在使用爱站查询域名信息，请耐心等待...")
         company_name = get_company(domain,1)
 
+        if company_name == "-":
+            print("域名都查不到公司，交个毛啊，非要交的话请手动")
+            exit()
+
         print("正在使用爱企查查询企业信息，请耐心等待...")
         company_info = aiqicha_get(company_name, 1)
         print(company_info)
@@ -47,7 +51,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
         if leak_type == "弱口令":
             doc = Document()
             paragraph = doc.add_paragraph()
-            run = paragraph.add_run(f'{company_name}网站存在{leak_type}\n\n弱口令账号：{weak_account}\n弱口令密码：{weak_password}')
+            run = paragraph.add_run(f'{company_name}存在{leak_type}\n\n弱口令账号：{weak_account}\n弱口令密码：{weak_password}')
             run.font.name = '等线'
             run.font.size = Pt(12)
             run._element.rPr.rFonts.set(qn('w:eastAsia'), '等线')
