@@ -9,4 +9,5 @@ simplejson
 fake_useragent
 ruamel.yaml
 vthread
-
+docx
+exceptions
