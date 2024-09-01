@@ -246,7 +246,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
-    aiqicha_driver = create_driver(1)
+    aiqicha_driver = create_driver(0)
     if os.path.exists("aiqicha_cookies.txt"):
         aiqicha_driver.get(f"https://aiqicha.baidu.com/")
         with open("aiqicha_cookies.txt", "r+") as cookie_input:
@@ -304,9 +304,11 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
             money = elements[0].text.replace(" ","").replace("\n","").replace("(元)","")
         except Exception:
             money = "None"
-
-        elements = html_tree.xpath('//span[@data-log-an="detail-head-phone"]/span')
-        phone_number = elements[0].text
+        try:
+            elements = html_tree.xpath('//span[@data-log-an="detail-head-phone"]/span')
+            phone_number = elements[0].text
+        except Exception:
+            phone_number = None
 
         if phone_number == None:#有些网站的手机号码是div包裹的
             elements = html_tree.xpath('//div[@class="ivu-poptip-rel"]')
@@ -319,7 +321,10 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
 
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
             province = re.findall(r"(.+)市",address)[0]
-            city = re.findall(r"市(.+)",address)[0]
+            try:
+                city = re.findall(r"市(.+)",address)[0]
+            except Exception:
+                city = None
             area = "None"
         elif "西藏自治区" in address:
             province = "西藏"
