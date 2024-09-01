@@ -4,7 +4,6 @@ from info.google import google_search
 from info.update_proxies import update_proxy_Bypool,update_proxy_ByFile
 from info.vulbox_commit import vulbox_src_page
 from info.butian_commit import butian_src_page
-from info.cnvd_commit import cnvd_src_page
 from info.get_ico_hash import get_hash_byURL,get_hash_byFile
 from filter.socket_getIP import domain_to_ip,thread_domain_to_ip
 from filter.cls_repeat_ip import remove_duplicates,remove_same_ip
@@ -14,6 +13,7 @@ from filter.filter_web_BackPlatform import filter_back_platform
 from filter.filter_c import filter
 from scan.dirsearch import dirscan
 from scan.oneforall import domain_scan
+from scan.finger import domains_cms
 from scan.xray_scan_urls import scan_urls,scan_urls_cookies,start_xray_listen
 from scan.port_scan import scan_ports_socket,scan_web_ports,thread_scan_http
 
@@ -345,8 +345,8 @@ if __name__ == "__main__":
                 continue
             dirscan(dirsearch_path,file_name,thread,language,proxies)#正式开始扫描
 
-        if opear == "7":#子域收集
-            choice = input("(1)单域名收集\n(2)多域名收集：")
+        if opear == "7":#信息收集
+            choice = input("(1)单域名收集\n(2)多域名收集\n(3)指纹收集：")
             if choice == "1":#单目标扫描
                 url = input("请输入要收集的域名：")
                 urls = domain_scan(url)
@@ -357,6 +357,9 @@ if __name__ == "__main__":
             if choice == "2":#多目标扫描
                 file_name = input("请输入文件名：")
                 pass
+            if choice == "3":#指纹扫描
+                file_name = input("请输入文件名：")
+                domains_cms(file_name)
 
         if opear == "8":#补天自动化提交
             domain = input("请输入存在漏洞的域名：")
@@ -399,6 +402,7 @@ if __name__ == "__main__":
             file_name = input("请输入文件名：")
             filter(file_name)
         if opear == "11":#cnvd半自动化提交
+            from info.cnvd_commit import cnvd_src_page
             domain = input("请输入存在漏洞的域名：")
             type = {"1": "逻辑缺陷", "2": "SQL注入", "3": "XSS", "4": "信息泄露", "5": "弱口令", "6": "命令执行"}
             choice = input(f"请选择漏洞类型:{type}：")
