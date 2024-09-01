@@ -58,14 +58,14 @@ def domains_cms(file_name):
     finger_path = config['finger_path']
     thread = input("线程数：")
 
-    with open(f"{finger_path}/config/config.py","r",encoding="utf-8") as finger_config_file:
+    with open(f"{finger_path}\config\config.py","r",encoding="utf-8") as finger_config_file:
         config_lines = finger_config_file.readlines()
 
     for num,line in enumerate(config_lines):
         if "threads" in line:
-            config_lines[num] = f"threads = {thread}"
+            config_lines[num] = f"threads = {thread}\n"
 
-    with open(f"{finger_path}/config/config.py","w",encoding="utf-8") as finger_config_outfile:
+    with open(f"{finger_path}\config\config.py","w",encoding="utf-8") as finger_config_outfile:
         finger_config_outfile.writelines(config_lines)
 
     command = ['python', f'{finger_path}/Finger.py', '-f', file_name]
@@ -74,8 +74,8 @@ def domains_cms(file_name):
         subprocess.run(command, capture_output=True, text=True,encoding='utf-8')
     except Exception as e:
         print(f"输出：{e}")
-    lateast_file_name = find_latest(f"{finger_path}/output")
-    shutil.move(f"{finger_path}/output/{lateast_file_name}",f"./{file_name.replace('.txt','.xlsx')}")
+    lateast_file_name = find_latest(f"{finger_path}\output")
+    shutil.move(f"{finger_path}\output\{lateast_file_name}",f"./{file_name.replace('.txt','.xlsx')}")
     print("收集完毕")
     fail_domains = []
     for domain in extract_fail_urls(f"{file_name.replace('.txt','.xlsx')}"):
