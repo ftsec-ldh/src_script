@@ -78,7 +78,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
             driver_path = r'drivers\win64\chromedriver.exe'
         if system == "Linux":
             driver_path = r'drivers/linux64/chromedriver'
-        if system == "Mac":
+        if system == "Darwin":
             driver_path = r'drivers/mac64/chromedriver'
 
         s = Service(driver_path)
@@ -168,7 +168,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
         element.send_keys(f"{suggestions[leak_type]}")
 
         element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='flawAttFile']")))#文件上传
-        element.send_keys(f"{os.getcwd()}\{company_name}存在{leak_type}.docx")
+        element.send_keys(f"{os.getcwd()}/{company_name}存在{leak_type}.docx")
 
 
         #用户中心
@@ -192,7 +192,7 @@ def login():
         driver_path = r'drivers\win64\chromedriver.exe'
     if system == "Linux":
         driver_path = r'drivers/linux64/chromedriver'
-    if system == "Mac":
+    if system == "Darwin":
         driver_path = r'drivers/mac64/chromedriver'
     s = Service(driver_path)
     options = webdriver.ChromeOptions()
