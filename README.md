@@ -5,9 +5,8 @@ windows-chrome版本为122
 linux-chrome版本为91.0.4472  
 版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
-cnvd、补天、漏洞盒子半自动化只支持Windows  
-建议使用windows操作，如果非要使用Linux：推荐CentOS7
-其他系统未经调试  
+补天、漏洞盒子半自动化只支持Windows、其中cnvd可跨mac、windows  
+其他功能建议使用windows操作  
   
 # Windows安装chrome拓展：  
   
@@ -39,7 +38,8 @@ https://www.chromedownloads.net/chrome64linux-stable/
 版本：v0.1.9  
 一、增加CNVD半自动化提交功能  
 二、优化子域收集(集合oneforall+subfinder+virustotal爬取)  
-三、优化代码逻辑  
+三、优化代码  
+四、添加MAC跨平台  
   
 版本：v0.1.8  
 一、将不安全的eval方法替换为ast.literal_eval  
