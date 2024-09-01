@@ -22,7 +22,7 @@ def create_driver(无头模式=1):
         driver_path = r'drivers\win64\chromedriver.exe'
     if system == "Linux":
         driver_path = r'drivers/linux64/chromedriver'
-    if system == "Mac":
+    if system == "Darwin":
         driver_path = r'drivers/mac64/chromedriver'
 
     chrome_options = webdriver.ChromeOptions()
@@ -349,7 +349,7 @@ def aiqicha_captcha():
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
-    aiqicha_driver = create_driver(0)
+    aiqicha_driver = create_driver(1)
     aiqicha_driver.get(f"https://aiqicha.baidu.com/company_detail_28783255028393")
     time.sleep(3)
     aiqicha_driver.delete_all_cookies()
