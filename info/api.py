@@ -107,14 +107,14 @@ def get_ip_address(domain):#ping功能，反查域名再正向解析判断域名
         return "Error: Unable to resolve domain"
 
 #获取单位名称
-def get_company(url,picture=0):#picture等于1则截图
+def get_company(url,picture=1):#picture等于1则截图
     url = get_main(url)
     url = api_url + url
     driver = create_driver()
 
     driver.get(url)
+    time.sleep(2)
     text = driver.page_source
-
     name = re.findall(r"<span id=\"icp_company\">(.*?)</span></li>",text)
     name = ''.join(name)
     if "（" in name:
@@ -122,6 +122,7 @@ def get_company(url,picture=0):#picture等于1则截图
         name = name[:kuohao_index]
     if picture == 1:
         driver.get_screenshot_as_file(f"aizhan_{name}.png")
+    print(name)
     return name
 
 #获取权重
@@ -264,7 +265,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
                 aiqicha_driver.add_cookie(cookie)
             except Exception:
                 pass
-
+        print(f"公司名：{company_name}")
         aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
         try:
             WebDriverWait(aiqicha_driver, 10).until(
@@ -323,6 +324,7 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
                     if phone_number is not None and not bool(re.search(r'[\u4e00-\u9fff]', phone_number)):
                         phone_number = phone_number.replace(".", "").replace(" ", "").strip()
                         break
+        print(address)
 
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
             province = re.findall(r"(.+)市",address)[0]
@@ -334,6 +336,10 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
         elif "西藏自治区" in address:
             province = "西藏"
             city = re.findall(r"区(.+)",address)[0]
+            area = "None"
+        elif "新疆维吾尔自治区" in address:
+            province = "新疆"
+            city = re.findall(r"区(.+)", address)[0]
             area = "None"
         else:
             province = re.findall(r"(.+)省",address)[0]
@@ -353,10 +359,10 @@ def aiqicha_captcha():
     from selenium.webdriver.support import expected_conditions as EC
 
     aiqicha_driver = create_driver(0)
-    aiqicha_driver.get(f"https://aiqicha.baidu.com/company_detail_28783255028393")
+    aiqicha_driver.get(f"https://aiqicha.baidu.com/")
     time.sleep(3)
     aiqicha_driver.delete_all_cookies()
-    aiqicha_driver.get(f"https://aiqicha.baidu.com/company_detail_28783255028393")
+    aiqicha_driver.get(f"https://aiqicha.baidu.com/")
 
     WebDriverWait(aiqicha_driver, 600).until(
         EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
