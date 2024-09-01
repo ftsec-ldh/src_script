@@ -22,6 +22,8 @@ def create_driver(无头模式=1):
         driver_path = r'drivers\win64\chromedriver.exe'
     if system == "Linux":
         driver_path = r'drivers/linux64/chromedriver'
+    if system == "Mac":
+        driver_path = r'drivers/mac64/chromedriver'
 
     chrome_options = webdriver.ChromeOptions()
 
