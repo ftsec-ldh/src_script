@@ -5,7 +5,7 @@ windows-chrome版本为122
 linux-chrome版本为91.0.4472  
 版本不一致请自行更改driver版本  
 目前只有权重IP反查支持跨Win/Linux平台  
-补天、漏洞盒子半自动化只支持Windows  
+cnvd、补天、漏洞盒子半自动化只支持Windows  
 建议使用windows操作，如果非要使用Linux：推荐CentOS7
 其他系统未经调试  
   
