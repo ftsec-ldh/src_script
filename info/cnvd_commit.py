@@ -1,4 +1,4 @@
-import os,time
+import os,time,platform
 from info.api import get_company,aiqicha_get
 from filter.socket_getIP import domain_to_ip
 from docx import Document
@@ -73,7 +73,15 @@ def cnvd_src_page(domain, leak_type, leak_url):
         from selenium.webdriver.common.action_chains import ActionChains
         from selenium.webdriver.support.ui import Select
 
-        s = Service('drivers/win64/chromedriver.exe')
+        system = platform.system()
+        if system == "Windows":
+            driver_path = r'drivers\win64\chromedriver.exe'
+        if system == "Linux":
+            driver_path = r'drivers/linux64/chromedriver'
+        if system == "Mac":
+            driver_path = r'drivers/mac64/chromedriver'
+
+        s = Service(driver_path)
 
         options = webdriver.ChromeOptions()
         # 禁用GPU
@@ -178,7 +186,15 @@ def login():
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.wait import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
-    s = Service('drivers/win64/chromedriver.exe')
+
+    system = platform.system()
+    if system == "Windows":
+        driver_path = r'drivers\win64\chromedriver.exe'
+    if system == "Linux":
+        driver_path = r'drivers/linux64/chromedriver'
+    if system == "Mac":
+        driver_path = r'drivers/mac64/chromedriver'
+    s = Service(driver_path)
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-blink-features=AutomationControlled")  # 绕过cnvd检测
     cnvd_driver = webdriver.Chrome(service=s, options=options)
