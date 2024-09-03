@@ -343,7 +343,10 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
             area = "None"
         else:
             province = re.findall(r"(.+)省",address)[0]
-            city = re.findall(r"省(.+)市",address)[0]
+            try:
+                city = re.findall(r"省(.+)市",address)[0]
+            except Exception:
+                city = None
             area = extract_district(address)
 
         aiqicha_driver.quit()
