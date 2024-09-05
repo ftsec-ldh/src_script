@@ -86,8 +86,11 @@ def domains_cms(file_name):
         success_domains.append(get_main(domain))
 
     fail_domains_final = remove_common_items(success_domains, fail_domains)#过滤出最终的失败域名列表
-    with open(f"{file_name.replace('.txt', '')}失败域名.txt","a") as fail_domains_file:
-        for domain in fail_domains_final:
+
+    no_repeate_fail_domains = set()
+    for domain in fail_domains_final:
+        no_repeate_fail_domains.add(domain)
+
+    with open(f"{file_name.replace('.txt', '')}失败域名.txt", "a") as fail_domains_file:
+        for domain in no_repeate_fail_domains:
             fail_domains_file.write(domain + "\n")
-
-
