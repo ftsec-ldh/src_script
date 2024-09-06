@@ -58,6 +58,8 @@ def create_driver(无头模式=1):
     chrome_options.add_argument("no-sandbox")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument(f"user-agent={headers['User-Agent']}")
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    chrome_options.add_argument('disable-infobars')
 
     s = Service(driver_path)
     driver = webdriver.Chrome(service=s, options=chrome_options)
