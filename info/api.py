@@ -11,7 +11,7 @@ headers = {
 
 api_url = "https://www.aizhan.com/cha/"  # 查权重的接口
 api_url2 = "http://site.ip138.com/"  # 反查域名的接口
-api_url3 = "https://aiqicha.baidu.com/s?q="  # 查公司注册资金的接口
+api_url3 = "https://www.qcc.com/"  # 查公司注册资金的接口
 
 def create_driver(无头模式=1):
     from selenium import webdriver
@@ -30,28 +30,6 @@ def create_driver(无头模式=1):
 
     if 无头模式 == 1:
         chrome_options.add_argument("--headless")
-        # chrome_options.add_argument('blink-settings=imagesEnabled=false')
-        # prefs = {
-        #     "profile.managed_default_content_settings.images": 2,
-        #     "profile.default_content_setting_values": {
-        #         "automatic_downloads": 1,
-        #         "notifications": 1,
-        #         "popups": 1,
-        #         "geolocation": 1
-        #     }
-        # }
-        # chrome_options.add_experimental_option("prefs", prefs)
-        # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        # chrome_options.add_argument("--disable-blink-features")
-        # chrome_options.add_experimental_option('useAutomationExtension', False)
-        # chrome_options.add_argument('disable-infobars')
-        # # 禁用安全警告
-        # chrome_options.add_argument('--disable-web-security')
-        # chrome_options.add_argument("--ignore-certificate-errors")
-        # chrome_options.add_argument("--allow-running-insecure-content")
-        # # 禁止自动跳转(http自动跳转成https)
-        # chrome_options.add_argument("--disable-features=AutomaticHttpsRedirect")
 
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--disable-gpu")
@@ -60,6 +38,9 @@ def create_driver(无头模式=1):
     chrome_options.add_argument(f"user-agent={headers['User-Agent']}")
     chrome_options.add_experimental_option('useAutomationExtension', False)
     chrome_options.add_argument('disable-infobars')
+    chrome_options.add_argument("--disable-blink-features")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
     s = Service(driver_path)
     driver = webdriver.Chrome(service=s, options=chrome_options)
@@ -248,85 +229,81 @@ def extract_district(text):#提取区
     else:
         return None
 
-def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
+def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.chrome.service import Service
 
-    aiqicha_driver = create_driver(0)
-    if os.path.exists("aiqicha_cookies.txt"):
-        aiqicha_driver.get(f"https://aiqicha.baidu.com/")
-        with open("aiqicha_cookies.txt", "r+") as cookie_input:
-            try:
-                cookies = ast.literal_eval(cookie_input.read())
-            except SyntaxError:
-                print("aiqicha_cookie格式有误，请删除该文件重新获取cookie")
-        for cookie in cookies:
-            try:
-                aiqicha_driver.add_cookie(cookie)
-            except Exception:
-                pass
+    qcc_driver = create_driver(0)
+
+    qcc_driver.get("https://www.qcc.com")
+    if not os.path.exists("qcc_cookies.txt"):
+        print("检测到企查查cookies文件不存在，请你手动登录企查查")
+        qcc_login()
+
+
+    qcc_driver.get("https://www.qcc.com")
+    time.sleep(10)
+    qcc_driver.delete_all_cookies()
+
+
+    with open("qcc_cookies.txt","r") as f:
+        cookies = ast.literal_eval(f.read())
+    for cookie in cookies:
+        qcc_driver.add_cookie(cookie)
+
+    qcc_driver.get("https://www.qcc.com")
+
+
+    try:
+        element = WebDriverWait(qcc_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//span[text()='登录 | 注册']")))
+        print("检测到cookie失效，请手动删除cookie文件重新登录")
+        qcc_login()
+    except Exception:
+
         print(f"公司名：{company_name}")
-        aiqicha_driver.get(f"https://aiqicha.baidu.com/s?q={company_name}&t=0")
-        try:
-            WebDriverWait(aiqicha_driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, "//div[@class='wrap']/a"))
-            )  # 等待元素
-        except Exception:
-            os.remove("aiqicha_cookies.txt")
-            print("检测到需要重新过验证码，已自动删除aiqicha_cookies.txt，请重启我再次更新cookies，")
-            exit()
+        element = WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@id='searchKey']")))
+        element.send_keys(company_name)
 
-        html = aiqicha_driver.page_source
+        element = WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@class='btn btn-primary']")))
+        element.click()
 
         if picture == 1:
-            aiqicha_driver.get_screenshot_as_file(f"aiqicha_{company_name}.png")#截图
-
-        html_tree = etree.HTML(html)
-        elements = html_tree.xpath("//div[@class='wrap']/a")[0].get("data-log-title")#获取第一个超链接跳转地址
-        detail_page = "/company_detail_" + str(re.findall(r"\d.+",elements)[0])
-        aiqicha_driver.get(f"https://aiqicha.baidu.com/{detail_page}")#使用无头模式这里会被检测到
-
-        WebDriverWait(aiqicha_driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, "//td[preceding-sibling::td[@data-v-3869a30a='' and contains(text(), '行政区划')]]"))
-        )#等待元素
-
-        html = aiqicha_driver.page_source
+            qcc_driver.get_screenshot_as_file(f"qcc_{company_name}.png")#截图
 
 
-        html_tree = etree.HTML(html)
+        element = WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//a[@class='title copy-value']")))
+        url = element.get_attribute("href")
 
-        elements = html_tree.xpath("//td[preceding-sibling::td[@data-v-3869a30a='' and contains(text(), '行政区划')]]")
-        address = elements[0].text
+        qcc_driver.get(url)
+
+        WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//td[contains(text(),'国标行业')]")))
+        html = qcc_driver.page_source
 
 
-        elements = html_tree.xpath("//td[preceding-sibling::td[contains(text(),'所属行业')]]")
-        division = elements[0].text.replace("\n","").replace(" ","")
-        if division == "-":
-            division = "None"
 
-        try:
-            elements = html_tree.xpath("//td[contains(text(), '元')]")
-            money = elements[0].text.replace(" ","").replace("\n","").replace("(元)","")
-        except Exception:
-            money = "None"
-        try:
-            elements = html_tree.xpath('//span[@data-log-an="detail-head-phone"]/span')
-            phone_number = elements[0].text
-        except Exception:
-            phone_number = None
+        soup = BeautifulSoup(html, 'html.parser')
 
-        if phone_number == None:#有些网站的手机号码是div包裹的
-            elements = html_tree.xpath('//div[@class="ivu-poptip-rel"]')
-            for i in range(len(elements)):
-                if elements[i] is not None and hasattr(elements[i], 'text'):
-                    phone_number = elements[i].text
-                    if phone_number is not None and not bool(re.search(r'[\u4e00-\u9fff]', phone_number)):
-                        phone_number = phone_number.replace(".", "").replace(" ", "").strip()
-                        break
-        print(address)
+        td_element = soup.find('td', text='所属地区')
+        next_td = td_element.find_next_sibling('td')
+        span_element = next_td.find('span', class_='copy-value')
+        address = span_element.text#公司地址
+
+        parser = etree.HTMLParser()
+        tree = etree.fromstring(html, parser)
+
+        td_element = tree.xpath("//td[contains(text(), '国标行业')]/following-sibling::td[1]")
+        span_element = td_element[0].xpath(".//span[not(@class)]")
+        division = span_element[0].text#国标行业
+
+        td_element = tree.xpath("//td[span[contains(text(), '注册资本')]]/following-sibling::td[1]")
+        money = td_element[0].text#注册资本
+
+        span_element = tree.xpath("//span[@class='f overhide-part']/span[text()='电话：']")
+        phone_span = span_element[0].xpath(".//following-sibling::span//span[@class='copy-value']")#电话
+        phone_number = phone_span[0].text
 
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
             province = re.findall(r"(.+)市",address)[0]
@@ -351,33 +328,21 @@ def aiqicha_get(company_name,picture=0):#返回字典[公司省份、区市、�
                 city = None
             area = extract_district(address)
 
-        aiqicha_driver.quit()
+        qcc_driver.quit()
         return {"money":money,"province":province,"city":city,"area":area,"division":division,"phone_number":phone_number}
 
-    else:
-        print("检测到你没有过验证，请手动过验证：")
-        aiqicha_captcha()
-
-def aiqicha_captcha():
+def qcc_login():
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
-    aiqicha_driver = create_driver(0)
-    aiqicha_driver.get(f"https://aiqicha.baidu.com/")
-    time.sleep(3)
-    aiqicha_driver.delete_all_cookies()
-    aiqicha_driver.get(f"https://aiqicha.baidu.com/")
+    qcc_driver = create_driver(0)
+    qcc_driver.get("https://www.qcc.com/")
+    input("请手动登录后输入任意值：")
 
-    WebDriverWait(aiqicha_driver, 600).until(
-        EC.presence_of_element_located((By.XPATH, "//button[@class='search-btn']"))
-    )  # 等待元素
-
-    input("如需获取电话号码，请登录爱企查，登陆完毕输入任意字符继续：")
-
-    cookies = aiqicha_driver.get_cookies()
-    with open("aiqicha_cookies.txt", "w+") as output:
+    cookies = qcc_driver.get_cookies()
+    with open("qcc_cookies.txt", "w+") as output:
         output.write(str(cookies))
-    aiqicha_driver.quit()
+    qcc_driver.quit()
     print("写入cookie完成，请重启我")
     exit()
