@@ -1,5 +1,5 @@
 import os,time,platform
-from info.api import get_company,aiqicha_get
+from info.api import get_company,qcc_get
 from filter.socket_getIP import domain_to_ip
 from docx import Document
 from docx.shared import Inches,Pt
@@ -40,8 +40,8 @@ def cnvd_src_page(domain, leak_type, leak_url):
             print("域名都查不到公司，交个毛啊，非要交的话请手动")
             exit()
 
-        print("正在使用爱企查查询企业信息，请耐心等待...")
-        company_info = aiqicha_get(company_name, 1)
+        print("正在使用企查查搜索企业信息，请耐心等待...")
+        company_info = qcc_get(company_name, 1)
         print(company_info)
 
         ip = domain_to_ip(domain)
@@ -56,7 +56,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
             run.font.size = Pt(12)
             run._element.rPr.rFonts.set(qn('w:eastAsia'), '等线')
             doc.add_picture(f"aizhan_{company_name}.png", width=Inches(8.0))
-            doc.add_picture(f"aiqicha_{company_name}.png", width=Inches(8.0))
+            doc.add_picture(f"qcc_{company_name}.png", width=Inches(8.0))
             doc.save(f'{company_name}存在{leak_type}.docx')
         else:
             doc = Document()
@@ -66,7 +66,7 @@ def cnvd_src_page(domain, leak_type, leak_url):
             run.font.size = Pt(12)
             run._element.rPr.rFonts.set(qn('w:eastAsia'), '等线')
             doc.add_picture(f"aizhan_{company_name}.png", width=Inches(8.0))
-            doc.add_picture(f"aiqicha_{company_name}.png", width=Inches(8.0))
+            doc.add_picture(f"qcc_{company_name}.png", width=Inches(8.0))
             doc.save(f'{company_name}存在{leak_type}.docx')
 
         from selenium import webdriver
