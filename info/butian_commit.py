@@ -25,10 +25,6 @@ def butian_login(user,passwd):#检测到没有cookie再执行这一步拿cookie
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.wait import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
-    from info.api import get_company, aiqicha_get
-    from selenium.webdriver.common.action_chains import ActionChains
-    from selenium.webdriver.support.ui import Select
-    from selenium.webdriver.common.keys import Keys
 
     s = Service("drivers/win64/chromedriver.exe")
     driver_butian = webdriver.Chrome(service=s)
@@ -57,14 +53,14 @@ def butian_src_page(domain,leak_type,leak_url):
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.wait import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
-    from info.api import get_company, aiqicha_get
+    from info.api import get_company, qcc_get
     from selenium.webdriver.common.action_chains import ActionChains
     from selenium.webdriver.support.ui import Select
     from selenium.webdriver.common.keys import Keys
 
     if os.path.exists("butian_cookies.txt"):
         company_name = get_company(domain, 1)#获取公司名
-        area_dict = aiqicha_get(company_name, 1)#获取公司地址、注册资金、行业划分
+        area_dict = qcc_get(company_name, 1)#获取公司地址、注册资金、行业划分
         title = company_name + "页面存在" + leak_type
 
         s = Service("drivers/win64/chromedriver.exe")
