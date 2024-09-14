@@ -239,7 +239,7 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
-    qcc_driver = create_driver(0)
+    qcc_driver = create_driver(1)
 
     qcc_driver.get("https://www.qcc.com")
     if not os.path.exists("qcc_cookies.txt"):
