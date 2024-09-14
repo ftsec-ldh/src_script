@@ -1,6 +1,7 @@
 from info.api import get_main
 from filter.socket_getIP import domain_to_ip
 import re,threading
+from urllib.parse import urlparse
 
 def remove_duplicates(filename):
     lines_seen = set()
@@ -57,3 +58,25 @@ def remove_same_ip(filename,thread=0):
                     unique_ip_targets.append(ip)
                 print(f"进度：{进度}/{target_number}")
                 进度 += 1
+
+
+def extract_unique_domains_ips(urls, filename):
+    unique_domains_or_ips = set()
+
+    for url in urls:
+        parsed_url = urlparse(url)
+        netloc = parsed_url.netloc or parsed_url.path
+
+        if not netloc:
+            netloc = url
+
+        netloc = netloc.split('/')[0]
+        unique_domains_or_ips.add(netloc)
+
+    # 将结果写入文件
+    with open(filename, 'w') as file:
+        for item in unique_domains_or_ips:
+            file.write(f"{item}\n")
+
+    # 返回去重后的列表
+    return
