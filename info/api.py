@@ -1,5 +1,7 @@
 #从IP或域名列表中快速提取关键部分
 import platform,time,socket,urllib3,requests,re,random
+
+
 from urllib3.exceptions import InsecureRequestWarning
 from bs4 import BeautifulSoup
 import os,base64,ast
@@ -27,10 +29,10 @@ def create_driver(无头模式=1):
 
     chrome_options = webdriver.ChromeOptions()
 
-
     if 无头模式 == 1:
         chrome_options.add_argument("--headless")
 
+    chrome_options.page_load_strategy = 'none'
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("no-sandbox")
@@ -43,6 +45,7 @@ def create_driver(无头模式=1):
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
     s = Service(driver_path)
+
     driver = webdriver.Chrome(service=s, options=chrome_options)
     return driver
 
@@ -91,15 +94,17 @@ def get_ip_address(domain):#ping功能，反查域名再正向解析判断域名
 
 #获取单位名称
 def get_company(url,picture=1):#picture等于1则截图
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
     url = get_main(url)
     url = api_url + url
-    driver = create_driver()
+    driver = create_driver(0)
 
     driver.get(url)
-    time.sleep(2)
-    text = driver.page_source
-    name = re.findall(r"<span id=\"icp_company\">(.*?)</span></li>",text)
-    name = ''.join(name)
+
+    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@id='icp_company']")))
+    name = element.text
     if "（" in name:
         kuohao_index = name.index("（")
         name = name[:kuohao_index]
@@ -230,11 +235,9 @@ def extract_district(text):#提取区
         return None
 
 def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册资金、行业划分，联系电话]
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
-    from selenium.webdriver.chrome.service import Service
 
     qcc_driver = create_driver(0)
 
@@ -245,7 +248,7 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
 
 
     qcc_driver.get("https://www.qcc.com")
-    time.sleep(10)
+    time.sleep(6)
     qcc_driver.delete_all_cookies()
 
 
@@ -256,33 +259,28 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
 
     qcc_driver.get("https://www.qcc.com")
 
-
     try:
-        element = WebDriverWait(qcc_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//span[text()='登录 | 注册']")))
+        WebDriverWait(qcc_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//span[text()='登录 | 注册']")))
         print("检测到cookie失效，请手动删除cookie文件重新登录")
         qcc_login()
     except Exception:
 
-        print(f"公司名：{company_name}")
         element = WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@id='searchKey']")))
         element.send_keys(company_name)
 
         element = WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@class='btn btn-primary']")))
         element.click()
 
-        if picture == 1:
-            qcc_driver.get_screenshot_as_file(f"qcc_{company_name}.png")#截图
-
-
         element = WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//a[@class='title copy-value']")))
         url = element.get_attribute("href")
+
+        if picture == 1:
+            qcc_driver.get_screenshot_as_file(f"qcc_{company_name}.png")#截图
 
         qcc_driver.get(url)
 
         WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//td[contains(text(),'国标行业')]")))
         html = qcc_driver.page_source
-
-
 
         soup = BeautifulSoup(html, 'html.parser')
 
@@ -303,7 +301,11 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
 
         span_element = tree.xpath("//span[@class='f overhide-part']/span[text()='电话：']")
         phone_span = span_element[0].xpath(".//following-sibling::span//span[@class='copy-value']")#电话
-        phone_number = phone_span[0].text
+        try:
+            phone_number = phone_span[0].text
+        except Exception:
+            print("未寻找到电话号码，可能电话需要VIP")
+            phone_number = None
 
         if "北京" in address or "重庆" in address or "上海" in address or "天津" in address:
             province = re.findall(r"(.+)市",address)[0]
@@ -332,10 +334,6 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
         return {"money":money,"province":province,"city":city,"area":area,"division":division,"phone_number":phone_number}
 
 def qcc_login():
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-
     qcc_driver = create_driver(0)
     qcc_driver.get("https://www.qcc.com/")
     input("请手动登录后输入任意值：")
