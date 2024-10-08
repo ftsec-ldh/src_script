@@ -10,3 +10,4 @@ fake_useragent
 ruamel.yaml
 vthread
 python-docx
+openpyxl
