@@ -83,8 +83,6 @@ def extract_main_domain(line):
 
     return None
 
-
-
 def get_ip_address(domain):#ping功能，反查域名再正向解析判断域名是否真的绑定了IP
     try:
         ip_address = socket.gethostbyname(domain)
@@ -99,7 +97,7 @@ def get_company(url,picture=1):#picture等于1则截图
     from selenium.webdriver.support import expected_conditions as EC
     url = get_main(url)
     url = api_url + url
-    driver = create_driver(0)
+    driver = create_driver(1)
 
     driver.get(url)
 
@@ -117,7 +115,7 @@ def get_company(url,picture=1):#picture等于1则截图
 def get_rank(url):
     url = get_main(url)
     url = api_url + url
-    driver = create_driver()
+    driver = create_driver(1)
 
     driver.get(url)
     text = driver.page_source
@@ -211,7 +209,7 @@ def crawl_company(line,fofa=0,proxies=0,again=0):#fofa=0不启用fofa | proxies�
             return f"{str(domain)}"#返回代理池错误信息
 
     ###################传参IP才执行该步骤##########################
-    ###################传参域名才执行该步骤##########################
+    ###################传参域名才执行该步骤#########################
     else:
         name = get_company(line)
         content = f"站点：{line},公司名：{name}, 权重：{get_rank(line)}"
@@ -224,7 +222,6 @@ def crawl_company(line,fofa=0,proxies=0,again=0):#fofa=0不启用fofa | proxies�
                 with open("主域名查权重.txt", "a+") as output2:
                     output2.write(content + "\n")
     ###################传参域名才执行该步骤##########################
-
 def extract_district(text):#提取区
     pattern = r'([\u4e00-\u9fa5]+省)?([\u4e00-\u9fa5]+市)([\u4e00-\u9fa5]+区|市)'
     match = re.search(pattern, text)
@@ -246,11 +243,9 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
         print("检测到企查查cookies文件不存在，请你手动登录企查查")
         qcc_login()
 
-
     qcc_driver.get("https://www.qcc.com")
     time.sleep(6)
     qcc_driver.delete_all_cookies()
-
 
     with open("qcc_cookies.txt","r") as f:
         cookies = ast.literal_eval(f.read())
@@ -260,7 +255,7 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
     qcc_driver.get("https://www.qcc.com")
 
     try:
-        WebDriverWait(qcc_driver, 3).until(EC.presence_of_element_located((By.XPATH, "//span[text()='登录 | 注册']")))
+        WebDriverWait(qcc_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='登录 | 注册']")))
         print("检测到cookie失效，请手动删除cookie文件重新登录")
         qcc_login()
     except Exception:
@@ -299,8 +294,9 @@ def qcc_get(company_name,picture=0):#返回字典[公司省份、区市、注册
         td_element = tree.xpath("//td[span[contains(text(), '注册资本')]]/following-sibling::td[1]")
         money = td_element[0].text#注册资本
 
-        span_element = tree.xpath("//span[@class='f overhide-part']/span[text()='电话：']")
-        phone_span = span_element[0].xpath(".//following-sibling::span//span[@class='copy-value']")#电话
+        #span_element = tree.xpath("//span[@class='f overhide-part']/span[text()='电话：']")
+        #phone_span = span_element[0].xpath(".//following-sibling::span//span[@class='copy-value need-copy-field']")#电话
+        phone_span = tree.xpath("//span[@class='copy-value need-copy-field']")#电话
         try:
             phone_number = phone_span[0].text
         except Exception:
