@@ -26,7 +26,6 @@ def cnvd_src_page(domain, leak_type, leak_url):
         "命令执行": "1.通用的修复方案，升级插件/框架/服务最新版\n2.如若必须使用危险函数，那么针对危险函数进行过滤\n3.在进入执行命令函数前进行严格的检测和过滤\n4.尽量不要使用命令执行函数，不能完全控制的危险函数最好不使用，如果非要用的话可以加验证防止被其他人利用"
     }
 
-
     if os.path.exists("cnvd_cookies.txt"):
 
         if leak_type == "弱口令":
@@ -95,29 +94,23 @@ def cnvd_src_page(domain, leak_type, leak_url):
 
         # 去除顶端浏览器自动化测试提示
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
-
         options.add_argument("--disable-blink-features=AutomationControlled")
-
         options.add_argument("--disable-blink-features")
         # 禁用自动化扩展程序，绕过限制
         options.add_experimental_option('useAutomationExtension', False)
-
 
         cnvd_driver = webdriver.Chrome(service=s,options=options)
 
         cnvd_driver.get("https://www.cnvd.org.cn/")
         WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//a[@href='/user/login' and text()='登录']")))
-        time.sleep(2)
+        time.sleep(5)
         cnvd_driver.delete_all_cookies()
 
         with open("cnvd_cookies.txt","r+") as cookie_file:
             cookies = eval(cookie_file.read())
         for cookies in cookies:
             cnvd_driver.add_cookie(cookies)
-
-
         cnvd_driver.get("https://www.cnvd.org.cn/flaw/create")
-
         actions = ActionChains(cnvd_driver)
         try:
             element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@name='unitName']")))#涉事单位
@@ -173,14 +166,11 @@ def cnvd_src_page(domain, leak_type, leak_url):
 
         element = WebDriverWait(cnvd_driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//input[@id='flawAttFile']")))#文件上传
         element.send_keys(f"{os.getcwd()}/{company_name}存在{leak_type}.docx")
-
-
         #用户中心
         input()
     else:
         print("未检测到cookie")
         login()
-
 
 def login():
     account = input("邮件：")
@@ -200,7 +190,7 @@ def login():
         driver_path = r'drivers/mac64/chromedriver'
     s = Service(driver_path)
     options = webdriver.ChromeOptions()
-    options.add_argument("--disable-blink-features=AutomationControlled")  # 绕过cnvd检测
+    options.add_argument("--disable-blink-features=AutomationControlled")#绕过cnvd检测
     cnvd_driver = webdriver.Chrome(service=s, options=options)
 
     cnvd_driver.get("https://www.cnvd.org.cn/user/login")
@@ -211,7 +201,7 @@ def login():
     element.send_keys(password)
     print("请手动输入验证码并登录")
     WebDriverWait(cnvd_driver, 600).until(EC.presence_of_element_located((By.XPATH, "//a[@id='rightMenuli4' and text()='我的任务']")))
-    time.sleep(5)
+    time.sleep(10)
     cookies = cnvd_driver.get_cookies()
     with open('cnvd_cookies.txt', 'w+') as output:
         output.write(str(cookies))
