@@ -35,6 +35,11 @@ https://www.chromedownloads.net/chrome64linux-stable/
 ![image](https://github.com/1607131160/src_script/assets/128038117/2b031e6e-8102-4933-a27b-c009e9394371)  
 ![1ru3l-ho5tt](https://github.com/1607131160/src_script/assets/128038117/95e381dc-7c38-4d66-8dba-c88491debf14)  
 # 更新内容
+版本：v0.2.0  
+一、修复CNVD提交反复加载问题  
+二、修改企查查电话号码获取报错问题  
+三、去除信息收集功能(鸡肋功能)  
+  
 版本：v0.1.9  
 一、增加CNVD半自动化提交功能  
 二、优化子域收集(集合oneforall+subfinder+virustotal爬取)  
